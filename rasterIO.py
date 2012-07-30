@@ -1,84 +1,83 @@
-''' Library of Geospatial raster functions to convert OSGEO.GDAL formats to/from Numpy masked arrays.
+"""
+rasterIO -  Library of functions to convert geospatial raster formats to/from Numpy masked arrays.
 
-rasterIO
-========
+B{Introduction}
 
-This library contains wrapper functions for GDAL Python I/O bindings, converting data to Numerical Python 
-multi-dimensional array's in memory for processing. Subsequent, generated array's can be written to disk
-in the standard Geospatial GeoTiff format.
+This library contains wrapper functions for GDAL Python bindings, converting data to Numerical Python 
+multi-dimensional array's in memory for processing. Subsequent generated arrays can be written to disk
+in the standard geospatial GeoTiff format.
 
-Notes
------
-	Error checking - rasterIO contains minimal user-level error checking.
+B{Notes}
 
-Supported Formats
------------------
-	Input: rasterIO supports reading any GDAL supported raster format
+   - Error checking - rasterIO contains minimal user-level error checking
 
-	Output: rasterIO generates GeoTiff files by default (this can be modified in the code).
-		GeoTiffs are created with embedded binary header files containing geo information
+B{Supported Formats}
+   
+   - Input: 
+      - rasterIO supports reading any GDAL supported raster format
 
-Supported Datatypes
--------------------
-	Raster IO supports Float32 and Int16 data types.
-	The default datatype is Float32. Boolean datasets use Int16 datatypes.
+   - Output: 
+            - rasterIO generates GeoTiff files by default (this can be modified in the source code)
+            - GeoTiffs are created with embedded binary header files containing geo information
+
+B{Supported Datatypes}
+
+   - Raster IO supports Float32 and Int16 data types
+   - The default datatype is Float32
+   - Boolean datasets use Int16 datatypes
 	
-NoDataValue
------------
-	If the input data has no recognisable NoDataValue (readable by GDAL) then the input NoDataValue
-	is assumed to be 9999. This can be changed by manually specifying an input NoDataVal when calling readrasterbands().
-	In accordance with GDAL the output data NoDataValue is 9999 or 9999.0 or can be manually set by when writrasterbands().
-	When using unsigned integer data types the default output NoDataValue will be 0.
+B{NoDataValue}
 
-How to use documentation
-------------------------
-Documentation for module functions is provided as Python docstrings, accessible from an interactive Python terminal.
-Within docstrings examples from an interactive Python console are identified using '>>>'. 
-Further information is given to developers within the source code using '#' comment strings.
-To view this text and a list of available functions call the Python in-built help command, specifying module name.
+If the input data has no recognisable NoDataValue (readable by GDAL) then the input NoDataValue
+is assumed to be 9999. This can be changed by manually specifying an input NoDataVal when calling readrasterbands()
+In accordance with GDAL the output data NoDataValue is 9999 or 9999.0 or can be manually set by when writrasterbands()
+When using unsigned integer data types the default output NoDataValue will be 0
+
+B{How to use documentation}
+
+Documentation for module functions is provided as Python docstrings, accessible from an interactive Python terminal
+Within docstrings examples from an interactive Python console are identified using '>>>'
+Further information is given to developers within the source code using '#' comment strings
+To view this text and a list of available functions call the Python in-built help command, specifying module name
 
 
 	>>> import rasterIO
 	>>> help(rasterIO)
 	...this text...
 	
-For help on a specific function call the Python in-built help command, specifying module.function.
+For help on a specific function call the Python in-built help command, specifying module.function
 
 	>>> import rasterIO
 	>>> help(rasterIO.wkt2epsg)
-		
-		Help on function wkt2epsg in module rasterIO:
-
+	Help on function wkt2epsg in module rasterIO
 	wkt2epsg(wkt)
-    		Accepts well known text of Projection/Coordinate Reference System and generates
-    		EPSG code
-	(END) 
+	Accepts well known text of Projection/Coordinate Reference System and generates EPSG code
 
-How to access functions
------------------------
-To access functions, import the module to Python and call the desired function, assigning the output to a named variable.
-Note that the primary input datatype (default) for all functions is either a Numpy array or a Numpy masked array. 
-Within this module the term "raster" is used to signify a Numpy/Numpy masked array of raster values.
-Use the rasterIO module to convert Numpy arrays to/from Geospatial raster data formats.
+B{How to access functions}
+
+To access functions, import the module to Python and call the desired function, assigning the output to a named variable
+Note that the primary input datatype (default) for all functions is either a Numpy array or a Numpy masked array
+Within this module the term "raster" is used to signify a Numpy/Numpy masked array of raster values
+Use the rasterIO module to convert Numpy arrays to/from Geospatial raster data formats
 
 	>>> import rasterIO
 	>>> band_number = 1
 	>>> rasterdata = rasterIO.readrasterband(gdal_file_pointer, band_number)
 
-Optional function arguments are shown in document strings in brackets [argument].
+Optional function arguments are shown in document strings in brackets [argument]
 	
-Dependencies
-------------
-Python 2.5 or greater
-Numerical python (Numpy) 1.2.1 or greater (1.4.1 recommended).
-	- Note that due to bugs in Numpy.ma module, Numpy 1.4.1 or greater is required to support masked arrays of integer values. 
-		* See comments in reasrasterband() for more information.
+B{Dependencies}
 
-License & Authors
------------------
-Copyright: Tom Holderness
-Released under the Simplified BSD License (see LICENSE.txt).
-'''
+Python 2.5 or greater
+Numerical python (Numpy) 1.2.1 or greater (1.4.1 recommended)
+	- Note that due to bugs in Numpy.ma module, Numpy 1.4.1 or greater is required to support masked arrays of integer values
+		* See comments in reasrasterband() for more information
+
+B{License & Authors}
+
+Copyright: Tom Holderness & Newcastle University\n
+Released under the Simplified BSD License (see license.txt)
+"""
 __version__ = "1.1.1"
 #!/usr/bin/env python
 # raster.py - module of raster handling functions using GDAL and NUMPY
@@ -259,7 +258,7 @@ def newrasterband(dst_ds, rasterarray, band_num, NoDataVal=None):
 
 # create function to write GeoTiff raster from NumPy n-dimensional array
 def writerasterbands(outfile, format, XSize, YSize, geotrans, epsg, NoDataVal=None, *rasterarrays ):
-	''' Accepts raster(s) in Numpy 2D-array, outputfile string, format and geotranslation metadata and writes to file on disk'''
+	''' Accepts raster(s) in Numpy 2D-array, outputfile string, format and geotranslation metadata and writes to file on disk.'''
 	# get number of bands
 	num_bands = len(rasterarrays)	
 	# create new raster
@@ -276,12 +275,12 @@ def writerasterbands(outfile, format, XSize, YSize, geotrans, epsg, NoDataVal=No
 def writerasterband(rasterarray, outfile, format, aXSize, aYSize, geotrans, epsg, NoDataVal=None):
 	''' Legacy function for backwards compatability with older scripts. Use writerasterbands instead.
 
-	Accepts raster in Numpy 2D-array, outputfile string, format and geotranslation metadata and writes to file on disk'''
+	Accepts raster in Numpy 2D-array, outputfile string, format and geotranslation metadata and writes to file on disk.'''
 	writerasterbands(outfile, format, aXSize, aYSize, geotrans, epsg, NoDataVal, rasterarray)
 		
 # function to get Authority (e.g. EPSG) code from well known text
 def wkt2epsg(wkt):
-	'''Accepts well known text of Projection/Coordinate Reference System and generates EPSG code'''
+	'''Accepts well known text of Projection/Coordinate Reference System and generates EPSG code.'''
 	if wkt is not None:
 		if wkt == '':
 			return 0
