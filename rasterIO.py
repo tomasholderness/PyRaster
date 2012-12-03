@@ -51,18 +51,19 @@ For help on a specific function call the Python in-built help command, specifyin
 	>>> help(rasterIO.wkt2epsg)
 	Help on function wkt2epsg in module rasterIO
 	wkt2epsg(wkt)
-	Accepts well known text of Projection/Coordinate Reference System and generates EPSG code
+	Accepts well known text of Projection/Coordinate 
+	Reference System and generates EPSG code
 
 B{How to access functions}
 
-To access functions, import the module to Python and call the desired function, assigning the output to a named variable
-Note that the primary input datatype (default) for all functions is either a Numpy array or a Numpy masked array
-Within this module the term "raster" is used to signify a Numpy/Numpy masked array of raster values
-Use the rasterIO module to convert Numpy arrays to/from Geospatial raster data formats
+To access functions, import the module to Python and call the desired function, assigning the output to a named variable.
+Note that the primary input datatype (default) for all functions is either a Numpy array or a Numpy masked array.
+Use the rasterIO module to convert Numpy arrays to/from Geospatial raster data formats, for example to read a raster:
 
-	>>> import rasterIO
+	>>> import rasterIO as rio
+	>>> pointer = rio.opengdalraster('file.tif')
 	>>> band_number = 1
-	>>> rasterdata = rasterIO.readrasterband(gdal_file_pointer, band_number)
+	>>> b1_data = rio.readrasterband(pointer, band_number)
 
 Optional function arguments are shown in document strings in brackets [argument]
 	
