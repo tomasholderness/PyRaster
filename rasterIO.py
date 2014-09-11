@@ -137,7 +137,7 @@ def opengdalraster(fname):
 		
 # function to read raster image metadata
 def readrastermeta(dataset):
-	'''Accepts GDAL raster dataset and returns, gdal_driver, XSize, YSize, projection info(well known text), geotranslation data.'''
+	'''Accepts GDAL raster dataset and returns, gdal_driver, XSize, YSize, NBand, projection info(well known text), geotranslation data.'''
 		# get GDAL driver
 	driver_short = dataset.GetDriver().ShortName
 	driver_long = dataset.GetDriver().LongName
