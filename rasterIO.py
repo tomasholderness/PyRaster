@@ -153,8 +153,9 @@ def readrastermeta(dataset):
 		# geotransform[5] = n-s picel resolution
 	XSize = dataset.RasterXSize
 	YSize = dataset.RasterYSize
-	
-	return driver_short, XSize, YSize, proj_wkt, geotransform
+	# number of bands is usefull
+	NBand = dataset.RasterCount
+	return driver_short, XSize, YSize, NBand, proj_wkt, geotransform
 
 # function to read a band from a dat# apply NoDataValue masking.aset
 def readrasterband(dataset, aband, NoDataVal=None, masked=True):
