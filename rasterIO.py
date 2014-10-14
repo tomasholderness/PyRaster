@@ -137,7 +137,7 @@ def opengdalraster(fname):
 		
 # function to read raster image metadata
 def readrastermeta(dataset):
-	'''Accepts GDAL raster dataset and returns, gdal_driver, XSize, YSize, projection info(well known text), geotranslation data.'''
+	'''Accepts GDAL raster dataset and returns, gdal_driver, XSize, YSize, NBand, projection info(well known text), geotranslation data.'''
 		# get GDAL driver
 	driver_short = dataset.GetDriver().ShortName
 	driver_long = dataset.GetDriver().LongName
@@ -153,8 +153,9 @@ def readrastermeta(dataset):
 		# geotransform[5] = n-s picel resolution
 	XSize = dataset.RasterXSize
 	YSize = dataset.RasterYSize
-	
-	return driver_short, XSize, YSize, proj_wkt, geotransform
+	# number of bands is usefull
+	NBand = dataset.RasterCount
+	return driver_short, XSize, YSize, NBand, proj_wkt, geotransform
 
 # function to read a band from a dat# apply NoDataValue masking.aset
 def readrasterband(dataset, aband, NoDataVal=None, masked=True):
