@@ -76,10 +76,10 @@ Numerical python (Numpy) 1.2.1 or greater (1.4.1 recommended)
 
 B{License & Authors}
 
-Copyright: Tom Holderness & Newcastle University\n
+Copyright: Tomas Holderness & Newcastle University\n
 Released under the Simplified BSD License (see license.txt)
 """
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 #!/usr/bin/env python
 # raster.py - module of raster handling functions using GDAL and NUMPY
 
@@ -137,7 +137,7 @@ def opengdalraster(fname):
 
 # function to read raster image metadata
 def readrastermeta(dataset):
-	'''Accepts GDAL raster dataset and returns, gdal_driver, XSize, YSize, NBand, projection info(well known text), geotranslation data.'''
+	'''Accepts GDAL raster dataset and returns a dictionary containing GDAL driver ('gdal_driver'), number of columns ('XSize'), number of rows ('YSize'), number of bands ('num_bands'), projection information ('projection'), geotranslation information ('geotranslation').'''
 		# get GDAL driver
 	driver_short = dataset.GetDriver().ShortName
 	driver_long = dataset.GetDriver().LongName
@@ -155,9 +155,9 @@ def readrastermeta(dataset):
 	YSize = dataset.RasterYSize
 	# number of bands is usefull
 	NBand = dataset.RasterCount
-	return driver_short, XSize, YSize, NBand, proj_wkt, geotransform
+	return {'driver':driver_short, 'XSize':XSize, 'YSize':YSize, 'num_bands':NBand, 'projection':proj_wkt, 'geotranslation':geotransform}
 
-# function to read a band from a dat# apply NoDataValue masking.aset
+# function to read a band from data and apply NoDataValue masking.aset
 def readrasterband(dataset, aband, NoDataVal=None, masked=True):
 	'''Accepts GDAL raster dataset and band number, returns Numpy 2D-array.'''
 	if dataset.RasterCount >= aband:
@@ -210,27 +210,27 @@ def readrasterband(dataset, aband, NoDataVal=None, masked=True):
 		raise TypeError
 
 # function to create new (empty) raster file on disk.
-def newgdalraster(outfile, format, XSize, YSize, geotrans, epsg, num_bands, gdal_dtype ):
+def newgdalraster(outfile, format, XSize, YSize, geotrans, epsg, num_bands, gdal_dtype):
 	'''Accepts file_path, format, X, Y, geotransformation, epsg, number_of_bands, gdal_datatype and returns gdal pointer to new file.
 
 	This is a lower level function that allows users to control data output stream directly, use for specialist cases such as varying band data types or memory limited read-write situations.
 	Note that users should not forget to close file once data output is complete (dataset = None).'''
 	# get driver and driver properties
-	driver = gdal.GetDriverByName( format )
+	driver = gdal.GetDriverByName(format)
 	metadata  = driver.GetMetadata()
 	# check that specified driver has gdal create method and go create
 	if metadata.has_key(gdal.DCAP_CREATE) and metadata[gdal.DCAP_CREATE] =='YES':
 		# Create file
-		dst_ds = driver.Create( outfile, XSize, YSize, num_bands, gdal_dtype )
+		dst_ds = driver.Create(outfile, XSize, YSize, num_bands, gdal_dtype)
 		# define "srs" as a home for coordinate system parameters
 		srs = osr.SpatialReference()
 		# import the standard EPSG ProjCRS
-		srs.ImportFromEPSG( epsg )
+		srs.ImportFromEPSG(epsg)
 		# apply the geotransformation parameters
 		#print geotrans
-		dst_ds.SetGeoTransform( geotrans )
+		dst_ds.SetGeoTransform(geotrans)
 		# export these features to embedded well Known Text in the GeoTiff
-		dst_ds.SetProjection( srs.ExportToWkt() )
+		dst_ds.SetProjection(srs.ExportToWkt())
 		return dst_ds
 	# catch error if no write method for format specified
 	else:
@@ -253,10 +253,10 @@ def newrasterband(dst_ds, rasterarray, band_num, NoDataVal=None):
 		if rasterarray.mask is not ma.nomask:
 			output[rasterarray.mask] = NoDataVal
 		# write out numpy array with masking
-		dst_ds.GetRasterBand(band_num).WriteArray ( output )
+		dst_ds.GetRasterBand(band_num).WriteArray (output)
 	else:
 	# input array is numpy already, write array to band in file
-		dst_ds.GetRasterBand(band_num).WriteArray ( rasterarray )
+		dst_ds.GetRasterBand(band_num).WriteArray (rasterarray)
 
 # create function to write GeoTiff raster from NumPy n-dimensional array
 def writerasterbands(outfile, format, XSize, YSize, geotrans, epsg, NoDataVal=None, *rasterarrays ):
@@ -296,6 +296,7 @@ def wkt2epsg(wkt):
 			 	return int(srs.GetAuthorityCode("GEOGCS"))
 	else:
 		raise TypeError
+
 def band2txt(band, outfile):
 	'''Accepts numpy rasterand writes to specified text file on disk.'''
 	if ma.isMaskedArray(band) is True:

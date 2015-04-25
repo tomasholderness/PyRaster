@@ -47,7 +47,7 @@ Accepts a GDAL compatible file on disk and returns GDAL dataset.
 Accepts a GDAL raster dataset and band number, returns Numpy 2D-array.'''
 
 3. readrastermeta(dataset):
-Accepts GDAL raster dataset and returns the GDAL drive, number of rows, number of columns, number of bands, projection info (well known text), geotranslation metadata.
+Accepts GDAL raster dataset and returns a dictionary containing the GDAL driver, number of rows, number of columns, number of bands, projection info (well known text), and geotranslation metadata.
 
 Figure 1 shows the process of loading a raster file into a NumPy array using RasterIO open and read functions. For example:
 
@@ -59,8 +59,7 @@ band_number = 1
 b1_data = rio.readrasterband(dataset, band_number)
 
 print type(b1_data)
-
->>>
+<class 'numpy.ma.core.MaskedArray'>
 ```
 
 ![Figure 1 - loading raster data](https://raw.githubusercontent.com/talltom/PyRaster/dev/doc/diagrams/rasterIO_processing_flowline_read.jpg)
@@ -71,13 +70,13 @@ Figure 1. Loading raster data.
 ####Metadata Handling
 The `readrastermeta()` function complements the `readrasterband()` function to read the geospatial raster meta-data from a raster file. Using `readrastermeta()` with `readrasterband()` means that when a raster is loaded into a NumPy array the geospatial information can be retained through the Python processing flow-line, and written with output data if required.
 
-Continuing the example above:
+Continuing the example above to find the GDAL drive for the input data:
 
-```Python
+```python
 metadata = rio.readrastermeta(dataset)
-print metadata
-
->>>
+print metadata['driver']
+GTIFF
+```
 
 ###Raster Processing
 ####Simple Example
