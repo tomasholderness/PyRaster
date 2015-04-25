@@ -2,36 +2,38 @@ PyRaster
 ========
 ###Python Geospatial Image Processing
 
+[![Build Status](https://travis-ci.org/talltom/PyRaster.svg?branch=dev)](https://travis-ci.org/talltom/PyRaster)
+
+###About
 The RasterIO module uses the Geospatial Data Abstraction Library ([GDAL](http://gdal.org)) to read and write images and their geospatial metadata to and from NumPy arrays. The aim of the software is to provide an interface for processing large suites of geospatial raster data, and in particular satellite imagery.
 
 The utility scripts use RasterIO to provide a series of functions for batch processing remote sensing imagery, including vectorizing array operations and using the multiprocessing module.
 
 This software was developed as part of my PhD thesis to batch process large time series of Earth observation data.
 
-####Links
+###Links
 * PhD Thesis - [Holderness, T. 2013](http://hdl.handle.net/10443/1856)
 * [PyRaster presentation](https://tomholderness.files.wordpress.com/2012/12/holderness_asu_pyraster_pres_handout.pdf) to Mars Space Flight Facility in 2010
 * [Raster Processing Suite](http://talltom.github.io/Raster-Processing-Suite/) QGIS plugin.
 
-###Documentation
+###API Documentation
 A PDF of API documentation for RasterIO can be found in the "doc" folder.
 
-#####Supported Formats
+###Supported Formats
 * Input: Any [GDAL supported format](http://gdal.org/formats_list.html)
 * Output: Default is GeoTiffs created with embedded binary header files containing geospatial information
 
 * Default data-type: 32-bit float
 * RasterIO handles mapping of GDAL (C) data-types to Python
 
-#####NoData Value Handling
-If the input data has no recognisable NoDataValue (readable by GDAL) then the input NoDataValue is assumed to be 9999. This can be changed by manually specifying an input NoDataVal when calling read- rasterbands() In accordance with GDAL the output data NoDataValue is 9999 or 9999.0 or can be manually set by when writrasterbands() When using unsigned integer data types the default output NoDataValue will be 0.
-
-#####Dependencies
+###Dependencies
 * Python 2.7
 * Numpy 1.9
 * OSGeo (GDAL) 1.11
 
-#####In-built help
+###Instalation
+
+###In-built help
 Documentation for module functions is provided as Python docstrings, accessible from an interactive Python terminal. For example:
 
 ```python
@@ -42,8 +44,8 @@ wkt2epsg(wkt)
 Accepts well known text of Projection/Coordinate Reference System and generates EPSG code
 ```
 
-###Getting Started
-####Reading a file
+###1 Getting Started
+####1.1 Reading a file
 To read a raster file from disk and covert it to a NumPy array three RasterIO functions are required.
 
 1. opengdalraster(file name)
@@ -71,9 +73,10 @@ print type(b1_data)
 ![Figure 1 - loading raster data](https://raw.githubusercontent.com/talltom/PyRaster/dev/doc/diagrams/rasterIO_processing_flowline_read.jpg)
 Figure 1. Loading raster data.
 
-####Masked Arrays
+####1.2 Masked Arrays & NoData Values
+If the input data has no recognisable NoDataValue (readable by GDAL) then the input NoDataValue is assumed to be 9999. This can be changed by manually specifying an input NoDataVal when calling read- rasterbands() In accordance with GDAL the output data NoDataValue is 9999 or 9999.0 or can be manually set by when writrasterbands() When using unsigned integer data types the default output NoDataValue will be 0.
 
-####Metadata Handling
+####1.3 Metadata Handling
 The `readrastermeta()` function complements the `readrasterband()` function to read the geospatial raster meta-data from a raster file. Using `readrastermeta()` with `readrasterband()` means that when a raster is loaded into a NumPy array the geospatial information can be retained through the Python processing flow-line, and written with output data if required.
 
 Continuing the example above to find the GDAL drive for the input data:
@@ -84,10 +87,10 @@ print metadata['driver']
 GTIFF
 ```
 
-###Raster Processing
+###2 Raster Processing
 ####Simple Example
 
-###Writing Data
+###3 Writing Data
 
-###Scripts
+###4 Scripts
 ####
