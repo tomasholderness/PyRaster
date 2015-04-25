@@ -1,6 +1,5 @@
 """Unit tests for rasterIO.py"""
 import sys
-sys.path.append('../')
 import rasterIO as rio
 import unittest
 
