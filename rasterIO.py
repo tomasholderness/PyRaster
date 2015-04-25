@@ -86,14 +86,9 @@ __version__ = "1.1.2"
 import os, sys, struct
 import numpy as np
 import numpy.ma as ma
-try:
-    import osgeo.gdal as gdal
-    import osgeo.osr as osr
-    from osgeo.gdalconst import *
-except ImportError:
-    import gdal as gdal
-    import gdal.osr as osr
-    from gdal.gdalconst import *
+import osgeo.gdal as gdal
+import osgeo.osr as osr
+from osgeo.gdalconst import *
 
 # Data type dictionaries - references from GDT's to other Python types.
 # GDT -> Numpy
@@ -134,7 +129,7 @@ gdt2struct =	{
 # function to open GDAL raster dataset
 def opengdalraster(fname):
 	'''Accepts gdal compatible file on disk and returns gdal pointer.'''
-	dataset = gdal.Open( fname, GA_ReadOnly)
+	dataset = gdal.Open(fname, GA_ReadOnly)
 	if dataset != None:
 		return dataset
 	else:
