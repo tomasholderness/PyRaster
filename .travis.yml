@@ -1,16 +1,18 @@
 language: python
 python:
   - "2.7"
-# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+# commands to install gdal from apt.
+before_install:
+  - sudo apt-get update -y
+  - sudo apt-get install -y python-gdal
+# command to install remaining dependencies via pip install -r requirements.txt
 install: pip install -r requirements.txt
 # command to run tests, e.g. python setup.py test
 script:  python test/rasterIOtest.py
-
 # blacklist
 branches:
   except:
     - master
-
 # whitelist
 branches:
   only:
