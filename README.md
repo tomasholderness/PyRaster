@@ -2,13 +2,18 @@ PyRaster
 ========
 ###Python Geospatial Image Processing
 
-The RasterIO module uses the Geospatial Data Abstraction Library (GDAL)[http://gdal.org] to read and write images and their geospatial metadata to and from NumPy arrays. The aim of the software is to provide an interface for processing large suites of geospatial raster data, such satellite imagery.
+The RasterIO module uses the Geospatial Data Abstraction Library ([GDAL](http://gdal.org)) to read and write images and their geospatial metadata to and from NumPy arrays. The aim of the software is to provide an interface for processing large suites of geospatial raster data, and in particular satellite imagery.
 
 The utility scripts use RasterIO to provide a series of functions for batch processing remote sensing imagery, including vectorizing array operations and using the multiprocessing module.
 
-This software was developed as part of my PhD thesis ([Holderness 2013](https://theses.ncl.ac.uk/dspace/handle/10443/1856)), and is used for the [Raster Processing Suite] (http://talltom.github.io/Raster-Processing-Suite/) QGIS plugin.
+This software was developed as part of my PhD thesis to batch process large time series of Earth observation data.
 
-####Documentation
+####Links
+* PhD Thesis - [Holderness, T. 2013](http://hdl.handle.net/10443/1856)
+* [PyRaster presentation](https://tomholderness.files.wordpress.com/2012/12/holderness_asu_pyraster_pres_handout.pdf) to Mars Space Flight Facility in 2010
+* [Raster Processing Suite](http://talltom.github.io/Raster-Processing-Suite/) QGIS plugin.
+
+###Documentation
 A PDF of API documentation for RasterIO can be found in the "doc" folder.
 
 #####Supported Formats
