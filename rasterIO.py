@@ -86,7 +86,10 @@ __version__ = "1.1.2"
 import os, sys, struct
 import numpy as np
 import numpy.ma as ma
-import osgeo.osr as osr
+try:
+    import osgeo.osr as osr
+except ImportError:
+    import osr
 import osgeo.gdal as gdal
 from osgeo.gdalconst import *
 
