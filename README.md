@@ -22,8 +22,9 @@ A PDF of API documentation for RasterIO can be found in the "doc" folder.
 If the input data has no recognisable NoDataValue (readable by GDAL) then the input NoDataValue is assumed to be 9999. This can be changed by manually specifying an input NoDataVal when calling read- rasterbands() In accordance with GDAL the output data NoDataValue is 9999 or 9999.0 or can be manually set by when writrasterbands() When using unsigned integer data types the default output NoDataValue will be 0.
 
 #####Dependencies
-* Python 2.5 or later
-* Numpy 1.4.1 or later
+* Python 2.7
+* Numpy 1.9
+* OSGeo (GDAL) 1.11
 
 #####In-built help
 Documentation for module functions is provided as Python docstrings, accessible from an interactive Python terminal. For example:
