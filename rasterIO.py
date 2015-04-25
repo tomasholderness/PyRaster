@@ -87,11 +87,13 @@ import os, sys, struct
 import numpy as np
 import numpy.ma as ma
 try:
+    import osgeo.gdal as gdal
     import osgeo.osr as osr
+    from osgeo.gdalconst import *
 except ImportError:
-    import osr
-import osgeo.gdal as gdal
-from osgeo.gdalconst import *
+    import gdal as gdal
+    import gdal.osr as osr
+    from gdal.gdalconst import *
 
 # Data type dictionaries - references from GDT's to other Python types.
 # GDT -> Numpy
