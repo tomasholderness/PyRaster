@@ -10,7 +10,6 @@ Each NDVI scene is written out to a new file.
 To run, do:
 
 python batch-ndvi.py
-
 """
 #Import standard modules and rasterio
 import sys
@@ -39,6 +38,6 @@ for file in flist:
         epsg = rio.wkt2epsg(proj_wkt)
         # Write the NDVI matrix to a new raster file
         rio.writerasterband(new_ndvi_band, newname, metadata['XSize'],
-                                 metadata['YSize'], metadata['geotranslation'],
-                                 epsg)
+                            metadata['YSize'], metadata['geotranslation'],
+                            epsg)
 # loop will now go to next file in input list
