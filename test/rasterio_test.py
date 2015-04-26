@@ -3,10 +3,12 @@ import sys
 from pyraster import rasterio as rio
 import unittest
 
+
 class opengdalraster(unittest.TestCase):
 
     def testIOError(self):
         self.assertRaises(IOError, rio.opengdalraster, 'foo')
+
 
 class wkt2epsg(unittest.TestCase):
 
