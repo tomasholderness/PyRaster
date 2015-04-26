@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #rasterio.py - module of raster handling functions using GDAL and NUMPY
+#see __init__.py for metadata
 
 import os
 import sys
