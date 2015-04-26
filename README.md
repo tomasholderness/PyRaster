@@ -45,13 +45,23 @@ To install the RasterIO module do:
 ```
 The scripts should now be able to find and load the module.
 
-###Development
-The `test` folder contains simple unit testing of rasterio error handling:
+###Sample Data
+[To do] AVHRR scene.
 
-```bash
-[pyraster]$ python test/rasterio_test.py
-```
-Unit tests are run by Travis-CI.
+###Development
+* Testing
+
+  The `test` folder contains simple unit testing of rasterio error handling:
+
+  ```bash
+  [pyraster]$ python test/rasterio_test.py
+  ```
+Unit tests are run by Travis-CI when code is pushed to github.
+
+* Style
+
+  Procedural, Adheres to PEP 8, Functions contain docstrings.
+
 ##Using the Software
 ###1 Getting Started with the RasterIO API
 ####1.1 Loading the module
@@ -59,6 +69,8 @@ Unit tests are run by Travis-CI.
 from pyraster import rasterio
 
 ```
+####Style
+
 
 ####1.2 In-built help
 Documentation for module functions is provided as Python docstrings, accessible from an interactive Python terminal. For example:
