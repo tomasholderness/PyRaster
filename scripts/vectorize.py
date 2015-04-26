@@ -12,13 +12,14 @@ python vectorize.py
 import numpy
 from pyraster import rasterio as rio
 
+
 #define function to create Boolean output based on threshold
 def value_test(a, b):
     '''Accepts to values (a, b) returns 1 in a <=b, else returns 0'''
     if a <= b:
-            return 1
-        else:
-            return 0
+        return 1
+    else:
+        return 0
 #vectorize the function
 value_test_vect = numpy.vectorize(value_test)
 #open raster file
