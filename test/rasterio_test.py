@@ -1,6 +1,6 @@
-"""Unit tests for rasterIO.py"""
+"""Unit tests for rasterio"""
 import sys
-import rasterIO as rio
+from pyraster import rasterio as rio
 import unittest
 
 class opengdalraster(unittest.TestCase):

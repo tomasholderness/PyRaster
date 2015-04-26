@@ -5,14 +5,21 @@ PyRaster
 [![Build Status](https://travis-ci.org/talltom/PyRaster.svg?branch=dev)](https://travis-ci.org/talltom/PyRaster)
 
 ###About
-The RasterIO module uses the Geospatial Data Abstraction Library ([GDAL](http://gdal.org)) to read and write images and their geospatial metadata to and from NumPy arrays. The aim of the software is to provide an interface for processing large suites of geospatial raster data, and in particular satellite imagery.
+PyRaster provides two elements:
 
-The utility scripts use RasterIO to provide a series of functions for batch processing remote sensing imagery, including vectorizing array operations and using the multiprocessing module.
+1. RasterIO module
 
+  The aim of the module is to provide a high-level API for Python software development for processing large suites of geospatial rasters, with a particular focs on satellite imagery.
+
+  The RasterIO module uses the Geospatial Data Abstraction Library ([GDAL](http://gdal.org)) to read and write images and their geospatial metadata to and from NumPy arrays.
+
+2. Scripts
+
+  The utility scripts use RasterIO to provide a series of functions for batch processing remote sensing imagery, including vectorizing array operations and using the multiprocessing module.
+
+###References
 This software was developed as part of my PhD thesis to batch process large time series of Earth observation data.
-
-###Links
-* PhD Thesis - [Holderness, T. 2013](http://hdl.handle.net/10443/1856)
+* [PhD Thesis](http://hdl.handle.net/10443/1856) - Holderness, T. 2013
 * [PyRaster presentation](https://tomholderness.files.wordpress.com/2012/12/holderness_asu_pyraster_pres_handout.pdf) to Mars Space Flight Facility in 2010
 * [Raster Processing Suite](http://talltom.github.io/Raster-Processing-Suite/) QGIS plugin.
 
@@ -22,7 +29,6 @@ A PDF of API documentation for RasterIO can be found in the "doc" folder.
 ###Supported Formats
 * Input: Any [GDAL supported format](http://gdal.org/formats_list.html)
 * Output: Default is GeoTiffs created with embedded binary header files containing geospatial information
-
 * Default data-type: 32-bit float
 * RasterIO handles mapping of GDAL (C) data-types to Python
 
@@ -31,20 +37,20 @@ A PDF of API documentation for RasterIO can be found in the "doc" folder.
 * Numpy 1.9
 * OSGeo (GDAL) 1.11
 
-###Instalation
+###Installation
 
 ###In-built help
 Documentation for module functions is provided as Python docstrings, accessible from an interactive Python terminal. For example:
 
 ```python
->>> import rasterIO
->>> help(rasterIO.wkt2epsg)
+>>> from pyraster import rasterio
+>>> help(rasterio.wkt2epsg)
 Help on function wkt2epsg in module rasterIO
 wkt2epsg(wkt)
 Accepts well known text of Projection/Coordinate Reference System and generates EPSG code
 ```
 
-###1 Getting Started
+###1 Getting Started with the RasterIO API
 ####1.1 Reading a file
 To read a raster file from disk and covert it to a NumPy array three RasterIO functions are required.
 
@@ -60,7 +66,7 @@ Accepts GDAL raster dataset and returns a dictionary containing the GDAL driver,
 Figure 1 shows the process of loading a raster file into a NumPy array using RasterIO open and read functions. For example:
 
 ```python
-import rasterIO as rio
+from pyraster import rasterio as rio
 dataset = rio.opengdalraster('file.tif')
 
 band_number = 1
