@@ -48,20 +48,6 @@ The scripts should now be able to find and load the module.
 ###Sample Data
 [To do] AVHRR scene.
 
-###Development
-* Testing
-
-  The `test` folder contains simple unit testing of rasterio error handling:
-
-  ```bash
-  [pyraster]$ python test/rasterio_test.py
-  ```
-Unit tests are run by Travis-CI when code is pushed to github.
-
-* Style
-
-  Procedural, Adheres to PEP 8, Functions contain docstrings.
-
 ##Using the Software
 ###1 Getting Started with the RasterIO API
 ####1.1 Loading the module
@@ -140,4 +126,17 @@ In accordance with GDAL the output data NoDataValue is 9999 or 9999.0 or can be 
 ###3 Writing Data
 
 ###4 PyRaster Scripts
-####
+
+###Development
+* Testing
+
+  The `test` folder contains simple unit testing of rasterio error handling:
+
+  ```bash
+  [pyraster]$ python test/rasterio_test.py
+  ```
+Unit tests are run by Travis-CI when code is pushed to github.
+
+* Style
+
+  Procedural, adheres to PEP 8, functions contain docstrings.
