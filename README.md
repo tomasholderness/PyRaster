@@ -125,7 +125,40 @@ In accordance with GDAL the output data NoDataValue is 9999 or 9999.0 or can be 
 
 ###3 Writing Data
 
-###4 PyRaster Scripts
+###4 Scripts
+#### batch-ndvi.py
+This script calculates the Normalized Difference Vegetation Index (NDVI) using the first two bands of each image in the working directory.
+
+NDVI is defined as a ratio between two bands, where band 1 is in the visible wavelengths and band 2 is near-infrared:
+
+```python
+ndvi = (b2-b1)/(b2+b1)
+```
+(see X ref for further information)
+
+to run, do:
+```bash
+[pyraster]$ python scripts/batch-ndvi.py
+```
+Figure X - sample NDVI calculation
+
+batch-ndvi generates a new raster representing the NDVI values calculated. The suffix "-ndvi" is added to the output filename to distinguish it from the original file. The script is a simple example of iterating raster computation over a series of data.
+
+####vectorize.py
+NumPy contains a number of methods to optimize array routines (see ref). This script uses the vectorize process to create a Boolean output raster based on a threshold function.
+
+```python
+def value_test(a, b):
+    if a <= b:
+            return 1
+        else:
+            return 0
+```
+Then the function is vectorized, and a raster array can be passed in as an argument
+```
+value_test_vect = numpy.vectorize(value_test)
+new_array = value_test_vect(band1, some_value)
+```
 
 ###Development
 * Testing
