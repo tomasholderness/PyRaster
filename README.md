@@ -55,11 +55,9 @@ The scripts should now be able to find and load the module.
 from pyraster import rasterio
 
 ```
-####Style
-
 
 ####1.2 In-built help
-Documentation for module functions is provided as Python docstrings, accessible from an interactive Python terminal. For example:
+Documentation for module functions are provided as Python docstrings, accessible from an interactive Python terminal. For example:
 
 ```python
 >>> from pyraster import rasterio
@@ -73,15 +71,18 @@ Accepts well known text of Projection/Coordinate Reference System and generates 
 To read a raster file from disk and covert it to a NumPy array three RasterIO functions are required.
 
 1. opengdalraster(file name)
-Accepts a GDAL compatible file on disk and returns GDAL dataset.
 
-2. readrasterband(dataset, band_number, NoDataVal=None, masked=True):
-Accepts a GDAL raster dataset and band number, returns Numpy 2D-array.'''
+  Accepts a GDAL compatible file on disk and returns GDAL dataset.
 
-3. readrastermeta(dataset):
-Accepts GDAL raster dataset and returns a dictionary containing the GDAL driver, number of rows, number of columns, number of bands, projection info (well known text), and geotranslation metadata.
+2. readrasterband(dataset, band_number, NoDataVal=None, masked=True)
 
-Figure 1 shows the process of loading a raster file into a NumPy array using RasterIO open and read functions. For example:
+  Accepts a GDAL raster dataset and band number, returns Numpy 2D-array.'''
+
+3. readrastermeta(dataset)
+
+  Accepts GDAL raster dataset and returns a dictionary containing the GDAL driver, number of rows, number of columns, number of bands, projection info (well known text), and geotranslation metadata.
+
+Figure 1 shows the process of loading a raster file into a NumPy array using the RasterIO open and read functions. For example:
 
 ```python
 from pyraster import rasterio as rio
@@ -154,7 +155,7 @@ def value_test(a, b):
         else:
             return 0
 ```
-Then the function is vectorized, and a raster array can be passed in as an argument
+Once the function is vectorized, and a raster array can be passed in as an argument
 ```
 value_test_vect = numpy.vectorize(value_test)
 new_array = value_test_vect(band1, some_value)
