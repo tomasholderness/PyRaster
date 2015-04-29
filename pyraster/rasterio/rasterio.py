@@ -11,40 +11,6 @@ import osgeo.gdal as gdal
 import osgeo.osr as osr
 from osgeo.gdalconst import *
 
-#Data type dictionaries - references from GDT's to other Python types.
-#GDT -> Numpy
-gdt2npy = {
-    1: 'uint8',
-    2: 'uint16',
-    3: 'int16',
-    4: 'uint32',
-    5: 'int32',
-    6: 'float32',
-    7: 'float64'
-}
-#Numpy -> GDT
-npy2gdt = {
-    'uint8': 1,
-    'uint16': 2,
-    'int16': 3,
-    'uint32': 4,
-    'int32': 5,
-    'float32': 6,
-    'float64': 7
-}
-
-#GDT -> Struct
-gdt2struct = {
-    1: 'B',
-    2: 'H',
-    3: 'h',
-    4: 'I',
-    5: 'i',
-    6: 'f',
-    7: 'd'
-}
-
-
 #function to open GDAL raster dataset
 def opengdalraster(fname):
     '''Accepts gdal compatible file on disk and returns gdal pointer.'''

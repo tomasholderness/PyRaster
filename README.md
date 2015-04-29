@@ -110,6 +110,7 @@ metadata = rio.readrastermeta(dataset)
 print metadata['driver']
 GTIFF
 ```
+#refer to API docs for geotranslation?
 
 ####1.5 Masked Arrays & No Data Values
 
