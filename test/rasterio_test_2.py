@@ -65,11 +65,5 @@ class read_band(unittest.TestCase):
         self.assertRaises(ValueError, pyraster2.RasterIO().read_band, self.dataset, 2)
 
 
-        #pass
-        # test error of passing band number greater than dataset
-        # test no data value
-        # test mask function here also
-
-
 if __name__ == "__main__":
     unittest.main()

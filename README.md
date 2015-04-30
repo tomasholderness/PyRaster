@@ -175,3 +175,5 @@ Unit tests are run by Travis-CI when code is pushed to github.
 * Style
 
   Procedural, adheres to PEP 8, functions contain docstrings.
+
+  
