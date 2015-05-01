@@ -13,7 +13,7 @@ from osgeo.gdalconst import *
 
 #function to open GDAL raster dataset
 def opengdalraster(fname):
-    '''Accepts gdal compatible file on disk and returns gdal pointer.'''
+    '''Accepts GDAL compatible file on disk and returns GDAL pointer.'''
     dataset = gdal.Open(fname, GA_ReadOnly)
     if dataset is not None:
         return dataset
