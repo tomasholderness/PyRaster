@@ -180,7 +180,7 @@ class RasterIO:
                             +"available in dataset")
 
     #function to create new (empty) raster file on disk.
-    def newgdalraster(self, outfile, format, XSize, YSize, geotrans, epsg,
+    def new_raster(self, outfile, format, xsize, ysize, geotranslation, epsg,
     num_bands, gdal_dtype):
         '''Accepts file_path, format, X, Y, geotransformation, epsg,
         number_of_bands, gdal_datatype and returns gdal pointer to new file.
@@ -210,4 +210,4 @@ class RasterIO:
             return dst_ds
         #catch error if no write method for format specified
         else:
-            raise TypeError
+            raise IOError('Specified format not writeable by GDAL')

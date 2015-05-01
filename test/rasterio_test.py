@@ -1,4 +1,8 @@
-"""Unit tests for rasterio"""
+"""Unit tests for pyraster.RasterIO module
+
+reference: https://docs.python.org/3.3/library/unittest.html
+"""
+
 import sys
 import struct
 #from pyraster import rasterio as rio
@@ -131,6 +135,42 @@ class test_read_band(unittest.TestCase):
         #check masked_invalid called with output from masked_equal
         ma.masked_invalid.assert_called_with(3, copy=False)
 
+class test_new_raster(unittest.TestCase):
+    '''Test creation method'''
+
+    def setUp(self):
+        self.outfile = MagicMock()
+        self.format = MagicMock()
+        self.xsize = MagicMock()
+        self.ysize = MagicMock()
+        self.geotranslation = MagicMock()
+        self.epsg = MagicMock()
+        self.num_bands = MagicMock()
+        self.gdal_dtype = MagicMock()
+
+        self.metadata = MagicMock()
+        self.metadata.GetMetaData = MagicMock(return_value=1)
+
+        self.driver = MagicMock()
+        self.driver.GetMetadata = MagicMock(return_value=self.metadata)
+
+    def testCreateError(self):
+
+        self.assertRaises(SyntaxError, pyraster.RasterIO().new_raster, self.outfile, self.format,
+                    self.xsize, self.ysize, self.geotranslation, self.epsg, self.num_bands,
+                    self.gdal_dtype)
+
+        def null_name(name):
+            return 0
+
+        def null_driver():
+            return 0
+        """
+        with patch('osgeo.gdal.GetDriverByName', null_name):
+            self.assertRaises(SyntaxError, pyraster.RasterIO().new_raster, self.outfile, self.format,
+                        self.xsize, self.ysize, self.geotranslation, self.epsg, self.num_bands,
+                        self.gdal_dtype)
+        """
 
 if __name__ == "__main__":
     unittest.main()
