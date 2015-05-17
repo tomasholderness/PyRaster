@@ -136,7 +136,7 @@ class test_read_band(unittest.TestCase):
         ma.masked_invalid.assert_called_with(3, copy=False)
 
 class test_new_raster(unittest.TestCase):
-    '''Test creation method'''
+    '''Test raster creation method'''
 
     def setUp(self):
         #input mocks
@@ -153,6 +153,7 @@ class test_new_raster(unittest.TestCase):
 
     def testCreateError(self):
         '''Test IOError raised if GDAL can't write to that datatype'''
+
         def null_metadata(format):
             return self.driver
 
@@ -174,6 +175,7 @@ class test_new_raster(unittest.TestCase):
             output = pyraster.RasterIO().new_raster(self.outfile, 'GTIFF', self.xsize, self.ysize, self.geotranslation , self.epsg, self.num_bands,self.gdal_dtype)
             #check that output matches expected (mocked) value
             self.assertEqual(1,output())
+               
 
 
 if __name__ == "__main__":

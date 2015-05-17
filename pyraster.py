@@ -29,7 +29,7 @@ class RasterIO:
         '''Create an instance of a RasterIO interface'''
         #Data type dictionaries - references from GDT's to other Python types.
         #GDT -> Numpy
-        self.gdt2npy = {
+        self.gdt_to_npy = {
             1: 'uint8',
             2: 'uint16',
             3: 'int16',
@@ -41,7 +41,7 @@ class RasterIO:
         '''Dictionary of GDAL to NumPy data type mappings'''
 
         #Numpy -> GDT
-        self.npy2gdt = {
+        self.npy_to_gdt = {
             'uint8': 1,
             'uint16': 2,
             'int16': 3,
@@ -54,7 +54,7 @@ class RasterIO:
 
 
         #GDT -> Struct
-        self.gdt2struct = {
+        self.gdt_to_struct = {
             1: 'B',
             2: 'H',
             3: 'h',
@@ -66,9 +66,8 @@ class RasterIO:
         '''Dictionary of GDAL to struct module data type mappings'''
 
     def open(self, file_name):
-        '''
-        Accepts a GDAL compatible file on disk and returns GDAL dataset
-        '''
+        '''Accepts a GDAL compatible file on disk and returns GDAL dataset'''
+        
         dataset = gdal.Open(file_name, GA_ReadOnly)
         #check if something returned
         if dataset is not None:
@@ -119,7 +118,7 @@ class RasterIO:
         '''Accepts NumPy array, mask value and returns masked array'''
 
         #check if data type int or float using dictionary for numeric test
-        if self.npy2gdt[array.dtype.name] <= 5:
+        if self.npy_to_gdt[array.dtype.name] <= 5:
             #data is integer use masked_equal
             #apply NoDataValue masking.
             dataraster = ma.masked_equal(array, NoDataVal, copy=False)
@@ -154,14 +153,14 @@ class RasterIO:
             band.SetNoDataValue(NoDataVal)
             #create blank array to hold data [note Y,X format]
             #get data type from dictionary
-            datarray = np.zeros((band.YSize, band.XSize), self.gdt2npy[band.DataType])
+            datarray = np.zeros((band.YSize, band.XSize), self.gdt_to_npy[band.DataType])
             #create loop based on YAxis (i.e. num rows)
             for i in range(band.YSize):
                 #read lines of band
                 scanline = band.ReadRaster(0, i, band.XSize, 1, band.XSize, 1,
                                            band.DataType)
                 #unpack from binary representation
-                tuple_of_vals = struct.unpack(self.gdt2struct[band.DataType]
+                tuple_of_vals = struct.unpack(self.gdt_to_struct[band.DataType]
                                               * band.XSize,
                                               scanline)
                 #tuple_of_floats = struct.unpack('f' * band.XSize, scanline)
@@ -210,25 +209,70 @@ class RasterIO:
         else:
             raise IOError('Specified format not writeable by GDAL')
 
-    def new_band(dataset, rasterarray, band_num, NoDataVal=None):
+    def new_band(dataset, array, band_num, NoDataVal=None):
         '''Accepts a GDAL dataset, rasterarray, band number, [NoDataValue],
         and creates new band in file.'''
         #first check whether array is masked
-        if ma.isMaskedArray(rasterarray) is True:
+        if ma.isMaskedArray(array) is True:
             if NoDataVal is None:
-                if npy2gdt[rasterarray[0].dtype.name] == 1:
+                if npy_to_gdt[array[0].dtype.name] == 1:
                     NoDataVal = 0
                 else:
                     NoDataVal = 9999
             dst_ds.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
             #create a numpy view on the masked array
-            output = np.array(rasterarray, copy=False)
+            output = np.array(array, copy=False)
             #check if maskedarray has valid mask and apply to numpy array using
             # binary indexing.
-            if rasterarray.mask is not ma.nomask:
-                output[rasterarray.mask] = NoDataVal
+            if array.mask is not ma.nomask:
+                output[array.mask] = NoDataVal
             #write out numpy array with masking
             dst_ds.GetRasterBand(band_num).WriteArray(output)
         else:
             #input array is numpy already, write array to band in file
-            dst_ds.GetRasterBand(band_num).WriteArray(rasterarray)
+            dst_ds.GetRasterBand(band_num).WriteArray(array)
+
+    #create function to write GeoTiff raster from NumPy n-dimensional array
+    def writerasterbands(outfile, format, xsize, ysize, geotranslation, epsg,
+                         NoDataVal=None, *arrays):
+        ''' Accepts raster(s) in Numpy 2D-array, outputfile string, format and
+        geotranslation metadata and writes to file on disk.'''
+        #get number of bands
+        num_bands = len(arrays)
+        #create new raster
+        dst_ds = new_raster(outfile, format, xsize, ysize, geotranslation,
+                            epsg, num_bands, npy_to_gdt[arrays[0].dtype.name])
+        #add raster data from raster arrays
+        band_num = 1  # band counter
+        for band in arrays:
+            new_band(dst_ds, band, band_num, NoDataVal)
+            band_num += 1
+        #close output and flush cache to disk
+        dst_ds = None
+
+    #function to get Authority (e.g. EPSG) code from well known text
+    def wkt_to_epsg(wkt):
+        '''Accepts well known text of Projection/Coordinate Reference System and
+        generates EPSG code.'''
+        if wkt is not None:
+            if wkt == '':
+                return 0
+            else:
+                srs = osr.SpatialReference(wkt)
+                if (srs.IsProjected()):
+                    return int(srs.GetAuthorityCode("PROJCS"))
+                elif (srs.IsLocal()):
+                    return 0
+                else:
+                    return int(srs.GetAuthorityCode("GEOGCS"))
+        else:
+            raise TypeError
+
+
+    def band_to_txt(band, outfile):
+        '''Accepts numpy array writes to specified text file on disk.'''
+        if ma.isMaskedArray(band) is True:
+            outraster = ma.compressed(band)
+        else:
+            outraster = band
+        np.savetxt(outfile, outraster, fmt='%f')
