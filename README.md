@@ -7,11 +7,11 @@ PyRaster
 ##About
 PyRaster provides two elements:
 
-1. RasterIO module
+1. PyRaster module (RasterIO Class)
 
   The aim of the module is to provide a high-level API for Python software to process large suites of geospatial rasters, with a particular focus on satellite imagery.
 
-  The RasterIO module uses the Geospatial Data Abstraction Library ([GDAL](http://gdal.org)) to read and write images and their geospatial metadata to and from NumPy arrays.
+  The RasterIO class uses the Geospatial Data Abstraction Library ([GDAL](http://gdal.org)) to read and write images and their geospatial metadata to and from NumPy arrays.
 
 2. Scripts
 
@@ -24,7 +24,7 @@ This software was developed as part of my PhD thesis to batch process large time
 * [Raster Processing Suite](http://talltom.github.io/Raster-Processing-Suite/) QGIS plugin.
 
 ###Documentation
-* A PDF of RasterIO API documentation can be found in the `doc` folder
+* RasterIO API documentation in HTML format can be found in the `doc` folder
 * Instructions on using the software are provided below in this `README.md` file
 
 ###Supported Formats
@@ -45,14 +45,11 @@ To install the RasterIO module do:
 ```
 The scripts should now be able to find and load the module.
 
-###Sample Data
-[To do] AVHRR scene.
-
 ##Using the Software
 ###1 Getting Started with the RasterIO API
 ####1.1 Loading the module
 ```python
-from pyraster import rasterio
+from pyraster import RasterIO
 
 ```
 
@@ -60,8 +57,8 @@ from pyraster import rasterio
 Documentation for module functions are provided as Python docstrings, accessible from an interactive Python terminal. For example:
 
 ```python
->>> from pyraster import rasterio
->>> help(rasterio.wkt2epsg)
+>>> from pyraster import RasterIO
+>>> help(RasterIO().wkt_to_epsg)
 Help on function wkt2epsg in module rasterIO
 wkt2epsg(wkt)
 Accepts well known text of Projection/Coordinate Reference System and generates EPSG code
@@ -70,28 +67,25 @@ Accepts well known text of Projection/Coordinate Reference System and generates 
 ####1.3 Reading a file
 To read a raster file from disk and covert it to a NumPy array three RasterIO functions are required.
 
-1. opengdalraster(file name)
+1. open(file name)
 
   Accepts a GDAL compatible file on disk and returns GDAL dataset.
 
-2. readrasterband(dataset, band_number, NoDataVal=None, masked=True)
+2. read_band(dataset, band_number, NoDataVal=None, masked=True)
 
   Accepts a GDAL raster dataset and band number, returns Numpy 2D-array.'''
-
-3. readrastermeta(dataset)
-
-  Accepts GDAL raster dataset and returns a dictionary containing the GDAL driver, number of rows, number of columns, number of bands, projection info (well known text), and geotranslation metadata.
 
 Figure 1 shows the process of loading a raster file into a NumPy array using the RasterIO open and read functions. For example:
 
 ```python
-from pyraster import rasterio as rio
+import pyraster
+rio = pyraster.Raster()
 dataset = rio.opengdalraster('file.tif')
 
 band_number = 1
-b1_data = rio.readrasterband(dataset, band_number)
+b1 = rio.readrasterband(dataset, band_number)
 
-print type(b1_data)
+print type(b1)
 <class 'numpy.ma.core.MaskedArray'>
 ```
 
@@ -99,27 +93,26 @@ print type(b1_data)
 Figure 1. Loading Raster Data into a NumPy array using the PyRaster RasterIO module ([Holderness, T. 2013](http://hdl.handle.net/10443/1856)).
 
 ####1.4 Metadata Handling
-The `readrastermeta()` function complements `readrasterband()`,  to read the geospatial raster meta-data from a raster file.
+The `read_metadata()` function complements `read_band()`,  to read the geospatial raster meta-data from a raster file. The `read_metadata()` function accepts a GDAL raster dataset (i.e. from `open_raster`) and returns a dictionary containing the GDAL driver, number of rows, number of columns, number of bands, projection info (well known text), and geotranslation metadata.
 
-Using `readrastermeta()` with `readrasterband()` means that when a raster is loaded into a NumPy array the geospatial information can be retained through the Python processing flow-line, and written with output data if required.
+Using `read_metadata()` with `read_band()` means that when a raster is loaded into a NumPy array the geospatial information can be retained through the Python processing flow-line, and written with output data if required.
 
 For example, to find the GDAL drive for the input data:
 
 ```python
-metadata = rio.readrastermeta(dataset)
+metadata = rio.read_metadata(dataset)
 print metadata['driver']
 GTIFF
 ```
-#refer to API docs for geotranslation?
 
 ####1.5 Masked Arrays & No Data Values
 
 PyRaster uses [NumPy masked arrays](http://docs.scipy.org/doc/numpy/reference/maskedarray.html) to handle no data values in raster images. When masking is in place, masked values are not included in array calculations.
 
 No Data Values (`NoDataValue`) are derived from individual band metadata using the `band.GetNoDataValue()` [GDAL function](http://www.gdal.org/classGDALRasterBand.html#adcca51d230b5ac848c43f1896293fb50).
-If the input raster has no recognisable `NoDataValue` readable by GDAL then the input `NoDataValue` is assumed to be 9999. This can be changed by manually specifying an input NoDataVal when calling read- rasterbands()
+If the input raster has no recognisable `NoDataValue` readable by GDAL then the input `NoDataValue` is assumed to be 9999. This can be changed by manually specifying an input NoDataVal when calling read - rasterbands()
 
-In accordance with GDAL the output data NoDataValue is 9999 or 9999.0 or can be manually set by when writrasterbands(). Note that when using unsigned integer data types the default output NoDataValue will be 0.
+In accordance with GDAL the output data NoDataValue is 9999 or 9999.0 or can be manually set by when write_bands(). Note that when using unsigned integer data types the default output NoDataValue will be 0.
 
 
 ###2 Raster Processing with NumPy
@@ -127,22 +120,28 @@ In accordance with GDAL the output data NoDataValue is 9999 or 9999.0 or can be 
 
 ###3 Writing Data
 
-###4 Scripts
+###4 Scripts & Examples
 #### batch-ndvi.py
 This script calculates the Normalized Difference Vegetation Index (NDVI) using the first two bands of each image in the working directory.
 
-NDVI is defined as a ratio between two bands, where band 1 is in the visible wavelengths and band 2 is near-infrared:
+NDVI is defined as a ratio between two bands, where band 1 is in the red visible wavelength and band 2 is near-infrared:
 
 ```python
+import pyraster
+rio = pyraster.Raster()
+#open the dataset
+dataset = rio.opengdalraster('file.tif')
+#read the bands
+b1 = rio.readrasterband(dataset, 1)
+b2 = rio.readrasterband(dataset, 2)
 ndvi = (b2-b1)/(b2+b1)
 ```
-(see X ref for further information)
+(see https://en.wikipedia.org/wiki/Normalized_Difference_Vegetation_Index for further information on NDVI)
 
-to run, do:
+to run the scrip, do:
 ```bash
 [pyraster]$ python scripts/batch-ndvi.py
 ```
-Figure X - sample NDVI calculation
 
 batch-ndvi generates a new raster representing the NDVI values calculated. The suffix "-ndvi" is added to the output filename to distinguish it from the original file. The script is a simple example of iterating raster computation over a series of data.
 
@@ -162,10 +161,27 @@ value_test_vect = numpy.vectorize(value_test)
 new_array = value_test_vect(band1, some_value)
 ```
 
+###multiprocess.py
+
+###historgram.py
+
+###plot.py
+```python
+import matplotlib.pyplt as plt
+from matplotlib import cmap
+import pyraster
+rio = pyraster.Raster()
+dataset = rio.open('file.tif')
+band = rio.read_band(dataset,1)
+plt.imshow(band, cmap=cm.Greys_r, vmin=19, vmax=50)
+plt.show()
+```
+
+
 ###Development
 * Testing
 
-  The `test` folder contains simple unit testing of rasterio error handling:
+  The `test` folder contains simple unit testing for RasterIO:
 
   ```bash
   [pyraster]$ python test/rasterio_test.py
@@ -174,4 +190,4 @@ Unit tests are run by Travis-CI when code is pushed to github.
 
 * Style
 
-  adheres to PEP 8, functions contain docstrings, documentation built with pdoc
+  strive for PEP 8, functions contain docstrings, documentation built with pdoc

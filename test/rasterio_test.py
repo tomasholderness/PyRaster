@@ -5,7 +5,6 @@ reference: https://docs.python.org/3.3/library/unittest.html
 
 import sys
 import struct
-#from pyraster import rasterio as rio
 import unittest
 import pyraster
 from mock import MagicMock, patch
@@ -42,7 +41,8 @@ class test_read_metadata(unittest.TestCase):
         self.dataset.GetDriver().ShortName = 'short name'
         self.dataset.GetDriver().LongName = 'long name'
         self.dataset.GetProjection = MagicMock(return_value='projection')
-        self.dataset.GetGeoTransform = MagicMock(return_value='geotransformation')
+        self.dataset.GetGeoTransform = MagicMock(
+                                        return_value='geotransformation')
         self.dataset.RasterXSize = 1
         self.dataset.RasterYSize = 1
         self.dataset.RasterCount = 1
@@ -58,7 +58,8 @@ class test_read_metadata(unittest.TestCase):
                 'geotranslation': 'geotransformation'
                 }
 
-        self.assertDictEqual(expected,pyraster.RasterIO().read_metadata(self.dataset))
+        self.assertDictEqual(expected,
+                             pyraster.RasterIO().read_metadata(self.dataset))
 
 class test_mask_band(unittest.TestCase):
     '''Test NumPy masking'''
@@ -93,7 +94,8 @@ class test_read_band(unittest.TestCase):
         struct.unpack = MagicMock(return_value=(1))
 
     def testCheckNumBands(self):
-        self.assertRaises(ValueError, pyraster.RasterIO().read_band, self.dataset, 2)
+        self.assertRaises(ValueError, pyraster.RasterIO().read_band,
+                          self.dataset, 2)
 
     def testSetNoDataValue(self):
         #test read with NoDataVal set
@@ -116,10 +118,14 @@ class test_read_band(unittest.TestCase):
             return 0
         #test with mask flag
         with patch('pyraster.RasterIO.mask_band', null_mask):
-            self.assertEqual(0, pyraster.RasterIO().read_band(self.dataset, 1, masked=True))
+            self.assertEqual(0, pyraster.RasterIO().read_band(self.dataset,
+                                                              1,
+                                                              masked=True))
 
         #test without mask flag
-        self.assertEqual([[1]], pyraster.RasterIO().read_band(self.dataset, 1, masked=False))
+        self.assertEqual([[1]], pyraster.RasterIO().read_band(self.dataset,
+                                                              1,
+                                                              masked=False))
 
     def testFloatCheck(self):
         #setup mocked data
@@ -158,9 +164,16 @@ class test_new_raster(unittest.TestCase):
             return self.driver
 
         with patch('osgeo.gdal.GetDriverByName', null_metadata):
-            self.assertRaises(IOError, pyraster.RasterIO().new_raster, self.outfile, self.format,
-                        self.xsize, self.ysize, self.geotranslation, self.epsg, self.num_bands,
-                        self.gdal_dtype)
+            self.assertRaises(IOError,
+                              pyraster.RasterIO().new_raster,
+                              self.outfile,
+                              self.format,
+                              self.xsize,
+                              self.ysize,
+                              self.geotranslation,
+                              self.epsg,
+                              self.num_bands,
+                              self.gdal_dtype)
 
     def testMetadataCheck(self):
         '''Test metadata check and output creation'''
@@ -172,10 +185,16 @@ class test_new_raster(unittest.TestCase):
 
         with patch('osgeo._gdal.Driver_Create', null_create):
             #swap out creation method
-            output = pyraster.RasterIO().new_raster(self.outfile, 'GTIFF', self.xsize, self.ysize, self.geotranslation , self.epsg, self.num_bands,self.gdal_dtype)
+            output = pyraster.RasterIO().new_raster(self.outfile,
+                                                    'GTIFF',
+                                                    self.xsize,
+                                                    self.ysize,
+                                                    self.geotranslation,
+                                                    self.epsg,
+                                                    self.num_bands,
+                                                    self.gdal_dtype)
             #check that output matches expected (mocked) value
             self.assertEqual(1,output())
-               
 
 
 if __name__ == "__main__":

@@ -204,7 +204,7 @@ class RasterIO:
         else:
             raise IOError('Specified format not writeable by GDAL')
 
-    def new_band(dataset, array, band_num, NoDataVal=None):
+    def new_band(self, dataset, array, band_num, NoDataVal=None):
         """Accepts a GDAL dataset, rasterarray, band number, [NoDataValue],
         and creates new band in file."""
         #first check whether array is masked
@@ -228,7 +228,7 @@ class RasterIO:
             dst_ds.GetRasterBand(band_num).WriteArray(array)
 
     #create function to write GeoTiff raster from NumPy n-dimensional array
-    def writerasterbands(outfile, format, xsize, ysize, geotranslation, epsg,
+    def write_bands(self, outfile, format, xsize, ysize, geotranslation, epsg,
                          NoDataVal=None, *arrays):
         """ Accepts raster(s) in Numpy 2D-array, outputfile string, format and
         geotranslation metadata and writes to file on disk."""
@@ -246,7 +246,7 @@ class RasterIO:
         dst_ds = None
 
     #function to get Authority (e.g. EPSG) code from well known text
-    def wkt_to_epsg(wkt):
+    def wkt_to_epsg(self, wkt):
         """Accepts well known text of Projection/Coordinate Reference System and
         generates EPSG code."""
         if wkt is not None:
@@ -263,7 +263,7 @@ class RasterIO:
         else:
             raise TypeError
 
-    def band_to_txt(band, outfile):
+    def band_to_txt(self, band, outfile):
         """Accepts numpy array writes to specified text file on disk."""
         if ma.isMaskedArray(band) is True:
             outraster = ma.compressed(band)
