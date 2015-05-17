@@ -1,15 +1,11 @@
 """
 ###Python Geospatial Image Processing
 
-[http://github.com/talltom/pyraster](http://github.com/talltom/pyraster
-)
+http://github.com/talltom/pyraster](http://github.com/talltom/pyraster
 
-version 2.0
-"""
-__version__ = "2.0.0" # module version
+version 2.0"""
+__version__ = "2.0.0"  # module version
 
-import os
-import sys
 import struct
 import numpy as np
 import numpy.ma as ma
@@ -18,15 +14,15 @@ import osgeo.osr as osr
 from osgeo.gdalconst import GA_ReadOnly
 
 class RasterIO:
-    '''A high-level API for Python software to process large suites of
+    """A high-level API for Python software to process large suites of
     geospatial rasters, with a particular focus on satellite imagery.
 
       The RasterIO class uses the Geospatial Data Abstraction Library
       ([GDAL](http://gdal.org)) to read and write images and their geospatial
-      metadata to and from NumPy arrays.'''
+      metadata to and from NumPy arrays."""
 
     def __init__(self):
-        '''Create an instance of a RasterIO interface'''
+        """Create an instance of a RasterIO interface"""
         #Data type dictionaries - references from GDT's to other Python types.
         #GDT -> Numpy
         self.gdt_to_npy = {
@@ -66,8 +62,8 @@ class RasterIO:
         '''Dictionary of GDAL to struct module data type mappings'''
 
     def open(self, file_name):
-        '''Accepts a GDAL compatible file on disk and returns GDAL dataset'''
-        
+        """Accepts a GDAL compatible file on disk and returns GDAL dataset"""
+
         dataset = gdal.Open(file_name, GA_ReadOnly)
         #check if something returned
         if dataset is not None:
@@ -76,7 +72,7 @@ class RasterIO:
             raise IOError
 
     def read_metadata(self, dataset):
-        '''Accepts GDAL dataset, returns metadata dict
+        """Accepts GDAL dataset, returns metadata dict
         {gdal_driver,
         xsize,
         ysize,
@@ -92,7 +88,7 @@ class RasterIO:
         - geotransform[3] = top left y
         - geotransform[4] = rotation, 0 if image is "north up"
         - geotransform[5] = north to south pixel resolution
-        '''
+        """
         #get GDAL driver
         driver_short = dataset.GetDriver().ShortName
         driver_long = dataset.GetDriver().LongName
@@ -115,7 +111,7 @@ class RasterIO:
                 }
 
     def mask_band(self, array, NoDataVal):
-        '''Accepts NumPy array, mask value and returns masked array'''
+        """Accepts NumPy array, mask value and returns masked array"""
 
         #check if data type int or float using dictionary for numeric test
         if self.npy_to_gdt[array.dtype.name] <= 5:
@@ -135,8 +131,8 @@ class RasterIO:
 
     #function to read a band from data and apply NoDataValue masking
     def read_band(self, dataset, band_num, NoDataVal=None, masked=True):
-        '''Accepts GDAL raster dataset and band number, returns Numpy 2D-array
-        representing pixel values'''
+        """Accepts GDAL raster dataset and band number, returns Numpy 2D-array
+        representing pixel values"""
 
         if dataset.RasterCount >= band_num:
             #Get one band
@@ -180,20 +176,19 @@ class RasterIO:
     #function to create new (empty) raster file on disk.
     def new_raster(self, outfile, format, xsize, ysize, geotranslation, epsg,
     num_bands, gdal_dtype):
-        '''Accepts file_path, format, X, Y, geotransformation, epsg,
+        """Accepts file_path, format, X, Y, geotransformation, epsg,
         number_of_bands, gdal_datatype and returns gdal pointer to new file.
 
         This is a lower level function that allows users to control data output
-        stream directly, use for specialist cases such as varying band data types
+        stream directly, use for specialist cases (e.g. varying band data types)
         or memory limited read-write situations.
         Note that users should not forget to close file once data output is
-        complete (dataset = None).'''
+        complete (dataset = None)."""
         #get driver and driver properties
         driver = gdal.GetDriverByName(format)
         metadata = driver.GetMetadata()
         #check that specified driver has gdal create method and go create
-        if metadata.has_key(gdal.DCAP_CREATE) and \
-                metadata[gdal.DCAP_CREATE] == 'YES':
+        if gdal.DCAP_CREATE in metadata and metadata[gdal.DCAP_CREATE] == 'YES':
             #Create file
             dst_ds = driver.Create(outfile, xsize, ysize, num_bands, gdal_dtype)
             #define "srs" as a home for coordinate system parameters
@@ -210,8 +205,8 @@ class RasterIO:
             raise IOError('Specified format not writeable by GDAL')
 
     def new_band(dataset, array, band_num, NoDataVal=None):
-        '''Accepts a GDAL dataset, rasterarray, band number, [NoDataValue],
-        and creates new band in file.'''
+        """Accepts a GDAL dataset, rasterarray, band number, [NoDataValue],
+        and creates new band in file."""
         #first check whether array is masked
         if ma.isMaskedArray(array) is True:
             if NoDataVal is None:
@@ -235,8 +230,8 @@ class RasterIO:
     #create function to write GeoTiff raster from NumPy n-dimensional array
     def writerasterbands(outfile, format, xsize, ysize, geotranslation, epsg,
                          NoDataVal=None, *arrays):
-        ''' Accepts raster(s) in Numpy 2D-array, outputfile string, format and
-        geotranslation metadata and writes to file on disk.'''
+        """ Accepts raster(s) in Numpy 2D-array, outputfile string, format and
+        geotranslation metadata and writes to file on disk."""
         #get number of bands
         num_bands = len(arrays)
         #create new raster
@@ -252,8 +247,8 @@ class RasterIO:
 
     #function to get Authority (e.g. EPSG) code from well known text
     def wkt_to_epsg(wkt):
-        '''Accepts well known text of Projection/Coordinate Reference System and
-        generates EPSG code.'''
+        """Accepts well known text of Projection/Coordinate Reference System and
+        generates EPSG code."""
         if wkt is not None:
             if wkt == '':
                 return 0
@@ -268,9 +263,8 @@ class RasterIO:
         else:
             raise TypeError
 
-
     def band_to_txt(band, outfile):
-        '''Accepts numpy array writes to specified text file on disk.'''
+        """Accepts numpy array writes to specified text file on disk."""
         if ma.isMaskedArray(band) is True:
             outraster = ma.compressed(band)
         else:
