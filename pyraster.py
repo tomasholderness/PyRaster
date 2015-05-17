@@ -147,7 +147,6 @@ class RasterIO:
                 #test for band specified NoDataValue
                 if band.GetNoDataValue() is not None:
                     NoDataVal = band.GetNoDataValue()
-                #	print NoData
                 else:
                     #else set NoDataValue to be 9999.
                     NoDataVal = 9999
@@ -197,17 +196,39 @@ class RasterIO:
         if metadata.has_key(gdal.DCAP_CREATE) and \
                 metadata[gdal.DCAP_CREATE] == 'YES':
             #Create file
-            dst_ds = driver.Create(outfile, XSize, YSize, num_bands, gdal_dtype)
+            dst_ds = driver.Create(outfile, xsize, ysize, num_bands, gdal_dtype)
             #define "srs" as a home for coordinate system parameters
             srs = osr.SpatialReference()
             #import the standard EPSG ProjCRS
             srs.ImportFromEPSG(epsg)
             #apply the geotransformation parameters
-            #print geotrans
-            dst_ds.SetGeoTransform(geotrans)
+            dst_ds.SetGeoTransform(geotranslation)
             #export these features to embedded well Known Text in the GeoTiff
             dst_ds.SetProjection(srs.ExportToWkt())
             return dst_ds
         #catch error if no write method for format specified
         else:
             raise IOError('Specified format not writeable by GDAL')
+
+    def new_band(dataset, rasterarray, band_num, NoDataVal=None):
+        '''Accepts a GDAL dataset, rasterarray, band number, [NoDataValue],
+        and creates new band in file.'''
+        #first check whether array is masked
+        if ma.isMaskedArray(rasterarray) is True:
+            if NoDataVal is None:
+                if npy2gdt[rasterarray[0].dtype.name] == 1:
+                    NoDataVal = 0
+                else:
+                    NoDataVal = 9999
+            dst_ds.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
+            #create a numpy view on the masked array
+            output = np.array(rasterarray, copy=False)
+            #check if maskedarray has valid mask and apply to numpy array using
+            # binary indexing.
+            if rasterarray.mask is not ma.nomask:
+                output[rasterarray.mask] = NoDataVal
+            #write out numpy array with masking
+            dst_ds.GetRasterBand(band_num).WriteArray(output)
+        else:
+            #input array is numpy already, write array to band in file
+            dst_ds.GetRasterBand(band_num).WriteArray(rasterarray)

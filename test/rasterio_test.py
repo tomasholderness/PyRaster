@@ -139,38 +139,42 @@ class test_new_raster(unittest.TestCase):
     '''Test creation method'''
 
     def setUp(self):
+        #input mocks
         self.outfile = MagicMock()
         self.format = MagicMock()
         self.xsize = MagicMock()
         self.ysize = MagicMock()
         self.geotranslation = MagicMock()
-        self.epsg = MagicMock()
+        self.epsg = 4326
         self.num_bands = MagicMock()
         self.gdal_dtype = MagicMock()
-
-        self.metadata = MagicMock()
-        self.metadata.GetMetaData = MagicMock(return_value=1)
-
+        #driver object mocks
         self.driver = MagicMock()
-        self.driver.GetMetadata = MagicMock(return_value=self.metadata)
 
     def testCreateError(self):
+        '''Test IOError raised if GDAL can't write to that datatype'''
+        def null_metadata(format):
+            return self.driver
 
-        self.assertRaises(SyntaxError, pyraster.RasterIO().new_raster, self.outfile, self.format,
-                    self.xsize, self.ysize, self.geotranslation, self.epsg, self.num_bands,
-                    self.gdal_dtype)
-
-        def null_name(name):
-            return 0
-
-        def null_driver():
-            return 0
-        """
-        with patch('osgeo.gdal.GetDriverByName', null_name):
-            self.assertRaises(SyntaxError, pyraster.RasterIO().new_raster, self.outfile, self.format,
+        with patch('osgeo.gdal.GetDriverByName', null_metadata):
+            self.assertRaises(IOError, pyraster.RasterIO().new_raster, self.outfile, self.format,
                         self.xsize, self.ysize, self.geotranslation, self.epsg, self.num_bands,
                         self.gdal_dtype)
-        """
+
+    def testMetadataCheck(self):
+        '''Test metadata check and output creation'''
+
+        def null_create(self, *args):
+            #empty creation method
+            ds = MagicMock(return_value=1)
+            return ds
+
+        with patch('osgeo._gdal.Driver_Create', null_create):
+            #swap out creation method
+            output = pyraster.RasterIO().new_raster(self.outfile, 'GTIFF', self.xsize, self.ysize, self.geotranslation , self.epsg, self.num_bands,self.gdal_dtype)
+            #check that output matches expected (mocked) value
+            self.assertEqual(1,output())
+
 
 if __name__ == "__main__":
     unittest.main()
