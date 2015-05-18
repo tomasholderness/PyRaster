@@ -14,7 +14,8 @@ install:
   - pip install coveralls
 # command to run tests, e.g. python setup.py test
 script:
-  coverage run --pylib --source=pyraster test/rasterio_test.py
+  - python test/rasterio_test.py
+  - coverage run --pylib --source=pyraster test/rasterio_test.py
 
 # after success
 after_success:
