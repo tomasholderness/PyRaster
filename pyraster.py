@@ -227,7 +227,7 @@ class RasterIO:
             #input array is numpy already, write array to band in file
             dst_ds.GetRasterBand(band_num).WriteArray(array)
 
-    #create function to write GeoTiff raster from NumPy n-dimensional array
+    #create function to write rasters from NumPy n-dimensional array
     def write_bands(self, outfile, format, xsize, ysize, geotranslation, epsg,
                          NoDataVal=None, *arrays):
         """ Accepts raster(s) in Numpy 2D-array, outputfile string, format and

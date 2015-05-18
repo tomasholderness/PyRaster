@@ -12,8 +12,10 @@ To run, do:
 python vectorize.py
 """
 import numpy
-from pyraster import rasterio as rio
+import pyraster
 
+# Create instance of RasterIO class
+rio = pyraster.RasterIO()
 
 #define function to create Boolean output based on threshold
 def value_test(a, b):
@@ -25,12 +27,12 @@ def value_test(a, b):
 #vectorize the function
 value_test_vect = numpy.vectorize(value_test)
 #open raster file
-dataset = rio.opengdalraster('data/sample1.tif')
+dataset = rio.open('data/sample1.tif')
 #read in band 1
-band1 = rio.readrasterband(dataset, 1)
+band1 = rio.read_band(dataset, 1)
 #get raster metadata
-metadata = rio.readrastermeta(dataset)
+metadata = rio.read_metadata(dataset)
 #pass the new vectorized threshold function the matrix and test value
 new_matrix = value_test_vect(band1, some_value)
 #write Boolean matrix to raster file
-rio.writerasterband(dataset, metadata)
+rio.write_bands('newfile.tif', 'GTiff', metadata['xsize'], metadata['ysize'], metadata['geotranslation'], rio.wkt_to_epsg(metadata['projection']), new_ndvi_band)

@@ -8,11 +8,11 @@ To run, do:
 python histogram.py
 """
 
-import sys, os, string, rasterIO
+import sys, os, string, pyraster
 import numpy.ma as ma
 import matplotlib.pyplot as plt
 
-# histogram function
+# Histogram function
 def rasterHistogram(raster_matrix):
     '''Accepts matrix and generates histogram'''
 
@@ -29,6 +29,10 @@ def rasterHistogram(raster_matrix):
     # Show the plot on screen
     plt.show()
 
+# Open raster and read band
+rio = pyraster.RasterIO()
+dataset = rio.open('file1.tif')
+band1 = rio.read_band(dataset, 1)
+
 # Pass matrix representation of raster to function
-rasterHistogram(band)
-# Shows histogram on screen
+rasterHistogram(band1)

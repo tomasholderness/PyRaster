@@ -9,33 +9,31 @@ To run, do:
 python multiprocess.py
 """
 
-import sys, os, string, rasterIO
+import sys, os, string, pyraster
 from multiprocessing import Process, Queue
 
-# Create a function for the process
+rio = pyraster.RasterIO()
 
+# Create a function for the process
 def processfunction(file_list):
 
 	# Create a loop for all files in current directory
-
-
 	for file in file_list:
 
 		# Check file type (in this case Geotiff)
 		if file.endswith('.tif'):
 
 		# Open a pointer to the file
-		pointer = rasterIO.opengdalraster(file)
+		pointer = rio.open(file)
 
 		# Read the raster metadata for the new output file
-		driver, XSize, YSize, proj_wkt, geo_t_params = rasterIO.readrastermeta(pointer)
+		metadata = rio.read_metadata(pointer)
 
 		# Read the first band to a matrix called band_1
-		band_1 = rasterIO.readrasterband(pointer, 1)
+		band_1 = rio.read_band(pointer, 1)
 
 		# Read the second band to a matrix called band_2
-
-		band_2 =rasterIO.readrasterband(pointer, 2)
+		band_2 =rio.read_band(pointer, 2)
 
 		# Perform the NDVI calculation and put the results into a new matrix
 		new_ndvi_band = ((band_2 - band_1) / (band_2 + band_1))
@@ -45,10 +43,10 @@ def processfunction(file_list):
 		newname = './'+parts[0]+'_ndvi.tif' # ./filename_ndvi.tif
 
 	# Get the EPSG code from well known text projection
-	epsg = rasterIO.wkt2epsg(proj_wkt)
+	epsg = rasterIO.wkt_to_epsg(metadata['projection'])
 
 	# Write the NDVI matrix to a new raster file
-	rasterIO.writerasterband(new_ndvi_band, newname, XSize, YSize, geo_t_params, epsg)
+	rio.write_bands(newname, 'GTiff', metadata['xsize'], metadata['ysize'], metadata['geotranslation'], epsg, new_ndvi_band)
 
 # loop will now go to next file in input list
 # Create a run function to accept jobs from queue

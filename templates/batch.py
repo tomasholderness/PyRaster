@@ -22,14 +22,14 @@ rio = pyraster.RasterIO()
 for file in flist:
     # Check file type (in this case Geotiff)
     if file.endswith('.tif'):
-    # Open a pointer to the file
-        pointer = rio.open(file)
+    # Open a dataset to the file
+        dataset = rio.open(file)
         # Read the raster metadata for the new output file
-        metadata = rio.read_metadata(pointer)
+        metadata = rio.read_metadata(dataset)
         # Read the first band to a matrix called band_1
-        band_1 = rio.read_band(pointer, 1)
+        band_1 = rio.read_band(dataset, 1)
         # Read the second band to a matrix called band_2
-        band_2 = rio.read_band(pointer, 2)
+        band_2 = rio.read_band(dataset, 2)
         # Perform the NDVI calculation and put the results into a new matrix
         new_ndvi_band = ((band_2 - band_1) / (band_2 + band_1))
         # Get the input filename without extension and create a new file name
@@ -38,7 +38,7 @@ for file in flist:
         # Get the EPSG code from well known text projection
         epsg = rio.wkt_to_epsg(metadata['projection'])
         # Write the NDVI matrix to a new raster file
-        rio.writerasterband(new_ndvi_band, newname, metadata['xsize'],
+        rio.writerasterbands(newname, 'GTiff', metadata['xsize'],
                             metadata['ysize'], metadata['geotranslation'],
                             epsg)
 # loop will now go to next file in input list
