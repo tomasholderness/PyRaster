@@ -24,15 +24,16 @@ def value_test(a, b):
         return 1
     else:
         return 0
-#vectorize the function
-value_test_vect = numpy.vectorize(value_test)
+#vectorize the function, forcing 32-bit ints on 64-bit machines
+value_test_vect = numpy.vectorize(value_test, otypes=[numpy.int32])
 #open raster file
-dataset = rio.open('data/sample1.tif')
+dataset = rio.open('file1.tif')
 #read in band 1
 band1 = rio.read_band(dataset, 1)
 #get raster metadata
 metadata = rio.read_metadata(dataset)
 #pass the new vectorized threshold function the matrix and test value
-new_matrix = value_test_vect(band1, some_value)
+threshold = 20
+new_band = value_test_vect(band1, threshold)
 #write Boolean matrix to raster file
-rio.write_bands('newfile.tif', 'GTiff', metadata['xsize'], metadata['ysize'], metadata['geotranslation'], rio.wkt_to_epsg(metadata['projection']), new_ndvi_band)
+rio.write_bands('newfile.tif', 'GTiff', metadata['xsize'], metadata['ysize'], metadata['geotranslation'], rio.wkt_to_epsg(metadata['projection']), None, new_band)

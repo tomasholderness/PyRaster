@@ -6,5 +6,6 @@ setup(name='pyraster',
       author='Tomas Holderness',
       author_email='tomasholderness@gmail.com',
       url='https://github.com/talltom/PyRaster/',
-      license='Simplified BSD'
+      license='Simplified BSD',
+      py_modules = ['pyraster'],
      )

@@ -20,12 +20,12 @@ def rasterHistogram(raster_matrix):
     flat_raster = ma.compressed(raster_matrix)
 
     # Setup the plot (see matplotlib.sourceforge.net)
-    fig = plt.figure(figsize=(8,11))
+    fig = plt.figure(figsize=(8,8))
     ax = fig.add_subplot(1,1,1)
 
     # Plot histogram
-    ax.hist(flat_raster, 10, normed=0, histtype='bar',
-            align=mid)
+    ax.hist(flat_raster, 100, normed=0, histtype='bar',
+            align='mid')
     # Show the plot on screen
     plt.show()
 

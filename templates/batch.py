@@ -1,25 +1,26 @@
-    """
-    batch.py - batch process for geospatial rasters, to calculate
-    Normalised Difference Vegetation Index (NDVI) for all scenes in directory
+"""
+batch.py - batch process for geospatial rasters, to calculate
+Normalised Difference Vegetation Index (NDVI) for all scenes in directory
 
-    Part of the PyRaster suite https://github.com/talltom/PyRaster
+Part of the PyRaster suite https://github.com/talltom/PyRaster
 
-    Each NDVI scene is written out to a new file.
+Each NDVI scene is written out to a new file.
 
-    To run, do:
+To run, do:
+python batch.py
 
-    python batch.py
-    """
+"""
 #Import standard modules and rasterio
 import sys
 import os
 import string
-import pytaster
+import pyraster
 
 rio = pyraster.RasterIO()
+file_list = os.listdir(os.getcwd())
 
 #Create a loop for all files in current directory
-for file in flist:
+for file in file_list:
     # Check file type (in this case Geotiff)
     if file.endswith('.tif'):
     # Open a dataset to the file
@@ -38,7 +39,7 @@ for file in flist:
         # Get the EPSG code from well known text projection
         epsg = rio.wkt_to_epsg(metadata['projection'])
         # Write the NDVI matrix to a new raster file
-        rio.writerasterbands(newname, 'GTiff', metadata['xsize'],
+        rio.write_bands(newname, 'GTiff', metadata['xsize'],
                             metadata['ysize'], metadata['geotranslation'],
-                            epsg)
+                            epsg, None, new_ndvi_band)
 # loop will now go to next file in input list
