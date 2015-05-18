@@ -210,11 +210,11 @@ class RasterIO:
         #first check whether array is masked
         if ma.isMaskedArray(array) is True:
             if NoDataVal is None:
-                if npy_to_gdt[array[0].dtype.name] == 1:
+                if self.npy_to_gdt[array[0].dtype.name] == 1:
                     NoDataVal = 0
                 else:
                     NoDataVal = 9999
-            dst_ds.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
+            dataset.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
             #create a numpy view on the masked array
             output = np.array(array, copy=False)
             #check if maskedarray has valid mask and apply to numpy array using
@@ -222,25 +222,25 @@ class RasterIO:
             if array.mask is not ma.nomask:
                 output[array.mask] = NoDataVal
             #write out numpy array with masking
-            dst_ds.GetRasterBand(band_num).WriteArray(output)
+            dataset.GetRasterBand(band_num).WriteArray(output)
         else:
             #input array is numpy already, write array to band in file
-            dst_ds.GetRasterBand(band_num).WriteArray(array)
+            dataset.GetRasterBand(band_num).WriteArray(array)
 
     #create function to write rasters from NumPy n-dimensional array
     def write_bands(self, outfile, format, xsize, ysize, geotranslation, epsg,
-                         NoDataVal=None, *arrays):
+                         NoDataVal, *arrays):
         """ Accepts raster(s) in Numpy 2D-array, outputfile string, format and
         geotranslation metadata and writes to file on disk."""
         #get number of bands
         num_bands = len(arrays)
         #create new raster
-        dst_ds = new_raster(outfile, format, xsize, ysize, geotranslation,
-                            epsg, num_bands, npy_to_gdt[arrays[0].dtype.name])
+        dst_ds = self.new_raster(outfile, format, xsize, ysize, geotranslation,
+                            epsg, num_bands, self.npy_to_gdt[arrays[0].dtype.name])
         #add raster data from raster arrays
         band_num = 1  # band counter
         for band in arrays:
-            new_band(dst_ds, band, band_num, NoDataVal)
+            self.new_band(dst_ds, band, band_num, NoDataVal)
             band_num += 1
         #close output and flush cache to disk
         dst_ds = None
