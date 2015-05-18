@@ -6,7 +6,7 @@
     <title>pyraster API documentation</title>
     <meta name="description" content="###Python Geospatial Image Processing
 
-[http://github.com/talltom/pyraster](http://github.com/tallto..." />
+http://github.com/talltom/pyraster](http://github.com/talltom..." />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   
@@ -988,10 +988,15 @@ table {
           
   <ul>
     <li class="mono"><a href="#pyraster.RasterIO.__init__">__init__</a></li>
+    <li class="mono"><a href="#pyraster.RasterIO.band_to_txt">band_to_txt</a></li>
     <li class="mono"><a href="#pyraster.RasterIO.mask_band">mask_band</a></li>
+    <li class="mono"><a href="#pyraster.RasterIO.new_band">new_band</a></li>
+    <li class="mono"><a href="#pyraster.RasterIO.new_raster">new_raster</a></li>
     <li class="mono"><a href="#pyraster.RasterIO.open">open</a></li>
     <li class="mono"><a href="#pyraster.RasterIO.read_band">read_band</a></li>
     <li class="mono"><a href="#pyraster.RasterIO.read_metadata">read_metadata</a></li>
+    <li class="mono"><a href="#pyraster.RasterIO.wkt_to_epsg">wkt_to_epsg</a></li>
+    <li class="mono"><a href="#pyraster.RasterIO.write_bands">write_bands</a></li>
   </ul>
 
         </li>
@@ -1011,7 +1016,7 @@ table {
   <header id="section-intro">
   <h1 class="title"><span class="name">pyraster</span> module</h1>
   <h3>Python Geospatial Image Processing</h3>
-<p><a href="http://github.com/talltom/pyraster">http://github.com/talltom/pyraster</a></p>
+<p>http://github.com/talltom/pyraster](http://github.com/talltom/pyraster</p>
 <p>version 2.0</p>
   
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster', this);">Show source &equiv;</a></p>
@@ -1019,15 +1024,11 @@ table {
     <pre><code>"""
 ###Python Geospatial Image Processing
 
-[http://github.com/talltom/pyraster](http://github.com/talltom/pyraster
-)
+http://github.com/talltom/pyraster](http://github.com/talltom/pyraster
 
-version 2.0
-"""
-__version__ = "2.0.0" # module version
+version 2.0"""
+__version__ = "2.0.0"  # module version
 
-import os
-import sys
 import struct
 import numpy as np
 import numpy.ma as ma
@@ -1036,18 +1037,18 @@ import osgeo.osr as osr
 from osgeo.gdalconst import GA_ReadOnly
 
 class RasterIO:
-    '''A high-level API for Python software to process large suites of
+    """A high-level API for Python software to process large suites of
     geospatial rasters, with a particular focus on satellite imagery.
 
       The RasterIO class uses the Geospatial Data Abstraction Library
       ([GDAL](http://gdal.org)) to read and write images and their geospatial
-      metadata to and from NumPy arrays.'''
+      metadata to and from NumPy arrays."""
 
     def __init__(self):
-        '''Create an instance of a RasterIO interface'''
+        """Create an instance of a RasterIO interface"""
         #Data type dictionaries - references from GDT's to other Python types.
         #GDT -> Numpy
-        self.gdt2npy = {
+        self.gdt_to_npy = {
             1: 'uint8',
             2: 'uint16',
             3: 'int16',
@@ -1059,7 +1060,7 @@ class RasterIO:
         '''Dictionary of GDAL to NumPy data type mappings'''
 
         #Numpy -> GDT
-        self.npy2gdt = {
+        self.npy_to_gdt = {
             'uint8': 1,
             'uint16': 2,
             'int16': 3,
@@ -1072,7 +1073,7 @@ class RasterIO:
 
 
         #GDT -> Struct
-        self.gdt2struct = {
+        self.gdt_to_struct = {
             1: 'B',
             2: 'H',
             3: 'h',
@@ -1084,18 +1085,17 @@ class RasterIO:
         '''Dictionary of GDAL to struct module data type mappings'''
 
     def open(self, file_name):
-        '''
-        Accepts a GDAL compatible file on disk and returns GDAL dataset
-        '''
+        """Accepts a GDAL compatible file on disk and returns GDAL dataset"""
+
         dataset = gdal.Open(file_name, GA_ReadOnly)
         #check if something returned
         if dataset is not None:
             return dataset
         else:
-            raise IOError
+            raise IOError('Could not open file')
 
     def read_metadata(self, dataset):
-        '''Accepts GDAL dataset, returns metadata dict
+        """Accepts GDAL dataset, returns metadata dict
         {gdal_driver,
         xsize,
         ysize,
@@ -1111,7 +1111,7 @@ class RasterIO:
         - geotransform[3] = top left y
         - geotransform[4] = rotation, 0 if image is "north up"
         - geotransform[5] = north to south pixel resolution
-        '''
+        """
         #get GDAL driver
         driver_short = dataset.GetDriver().ShortName
         driver_long = dataset.GetDriver().LongName
@@ -1133,20 +1133,20 @@ class RasterIO:
                 'geotranslation': geotransform
                 }
 
-    def mask_band(dataarray, NoDataVal):
-        '''Accepts NumPy array, mask value and returns masked array'''
+    def mask_band(self, array, NoDataVal):
+        """Accepts NumPy array, mask value and returns masked array"""
 
         #check if data type int or float using dictionary for numeric test
-        if npy2gdt[datarray.dtype.name] <= 5:
+        if self.npy_to_gdt[array.dtype.name] <= 5:
             #data is integer use masked_equal
             #apply NoDataValue masking.
-            dataraster = ma.masked_equal(datarray, NoDataVal, copy=False)
+            dataraster = ma.masked_equal(array, NoDataVal, copy=False)
             #apply invalid data masking
             dataraster = ma.masked_invalid(dataraster, copy=False)
             return dataraster
         else:
             #data is float use masked_values
-            dataraster = ma.masked_values(datarray, NoDataVal, copy=False)
+            dataraster = ma.masked_values(array, NoDataVal, copy=False)
             #finaly apply mask for NaN values
             dataraster = ma.masked_invalid(dataraster, copy=False)
             #return array (raster)
@@ -1154,8 +1154,8 @@ class RasterIO:
 
     #function to read a band from data and apply NoDataValue masking
     def read_band(self, dataset, band_num, NoDataVal=None, masked=True):
-        '''Accepts GDAL raster dataset and band number, returns Numpy 2D-array
-        representing pixel values'''
+        """Accepts GDAL raster dataset and band number, returns Numpy 2D-array
+        representing pixel values"""
 
         if dataset.RasterCount >= band_num:
             #Get one band
@@ -1165,7 +1165,6 @@ class RasterIO:
                 #test for band specified NoDataValue
                 if band.GetNoDataValue() is not None:
                     NoDataVal = band.GetNoDataValue()
-                #	print NoData
                 else:
                     #else set NoDataValue to be 9999.
                     NoDataVal = 9999
@@ -1173,14 +1172,14 @@ class RasterIO:
             band.SetNoDataValue(NoDataVal)
             #create blank array to hold data [note Y,X format]
             #get data type from dictionary
-            datarray = np.zeros((band.YSize, band.XSize), self.gdt2npy[band.DataType])
+            datarray = np.zeros((band.YSize, band.XSize), self.gdt_to_npy[band.DataType])
             #create loop based on YAxis (i.e. num rows)
             for i in range(band.YSize):
                 #read lines of band
                 scanline = band.ReadRaster(0, i, band.XSize, 1, band.XSize, 1,
                                            band.DataType)
                 #unpack from binary representation
-                tuple_of_vals = struct.unpack(self.gdt2struct[band.DataType]
+                tuple_of_vals = struct.unpack(self.gdt_to_struct[band.DataType]
                                               * band.XSize,
                                               scanline)
                 #tuple_of_floats = struct.unpack('f' * band.XSize, scanline)
@@ -1189,13 +1188,111 @@ class RasterIO:
 
             #check if masked=True
             if masked is True:
-                return mask_band(datarray, NoDataVal)
+                return self.mask_band(datarray, NoDataVal)
             else:
                 #user wants numpy array, no masking.
                 return datarray
         else:
             raise ValueError("read_band: Band number exceeeds number of bands "
                             +"available in dataset")
+
+    #function to create new (empty) raster file on disk.
+    def new_raster(self, outfile, format, xsize, ysize, geotranslation, epsg,
+    num_bands, gdal_dtype):
+        """Accepts file_path, format, X, Y, geotransformation, epsg,
+        number_of_bands, gdal_datatype and returns gdal pointer to new file.
+
+        This is a lower level function that allows users to control data output
+        stream directly, use for specialist cases (e.g. varying band data types)
+        or memory limited read-write situations.
+        Note that users should not forget to close file once data output is
+        complete (dataset = None)."""
+        #get driver and driver properties
+        driver = gdal.GetDriverByName(format)
+        metadata = driver.GetMetadata()
+        #check that specified driver has gdal create method and go create
+        if gdal.DCAP_CREATE in metadata and metadata[gdal.DCAP_CREATE] == 'YES':
+            #Create file
+            dst_ds = driver.Create(outfile, xsize, ysize, num_bands, gdal_dtype)
+            #define "srs" as a home for coordinate system parameters
+            srs = osr.SpatialReference()
+            #import the standard EPSG ProjCRS
+            srs.ImportFromEPSG(epsg)
+            #apply the geotransformation parameters
+            dst_ds.SetGeoTransform(geotranslation)
+            #export these features to embedded well Known Text in the GeoTiff
+            dst_ds.SetProjection(srs.ExportToWkt())
+            return dst_ds
+        #catch error if no write method for format specified
+        else:
+            raise IOError('Specified format not writeable by GDAL')
+
+    def new_band(self, dataset, array, band_num, NoDataVal=None):
+        """Accepts a GDAL dataset, rasterarray, band number, [NoDataValue],
+        and creates new band in file."""
+        #first check whether array is masked
+        if ma.isMaskedArray(array) is True:
+            if NoDataVal is None:
+                if npy_to_gdt[array[0].dtype.name] == 1:
+                    NoDataVal = 0
+                else:
+                    NoDataVal = 9999
+            dst_ds.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
+            #create a numpy view on the masked array
+            output = np.array(array, copy=False)
+            #check if maskedarray has valid mask and apply to numpy array using
+            # binary indexing.
+            if array.mask is not ma.nomask:
+                output[array.mask] = NoDataVal
+            #write out numpy array with masking
+            dst_ds.GetRasterBand(band_num).WriteArray(output)
+        else:
+            #input array is numpy already, write array to band in file
+            dst_ds.GetRasterBand(band_num).WriteArray(array)
+
+    #create function to write rasters from NumPy n-dimensional array
+    def write_bands(self, outfile, format, xsize, ysize, geotranslation, epsg,
+                         NoDataVal=None, *arrays):
+        """ Accepts raster(s) in Numpy 2D-array, outputfile string, format and
+        geotranslation metadata and writes to file on disk."""
+        #get number of bands
+        num_bands = len(arrays)
+        #create new raster
+        dst_ds = new_raster(outfile, format, xsize, ysize, geotranslation,
+                            epsg, num_bands, npy_to_gdt[arrays[0].dtype.name])
+        #add raster data from raster arrays
+        band_num = 1  # band counter
+        for band in arrays:
+            new_band(dst_ds, band, band_num, NoDataVal)
+            band_num += 1
+        #close output and flush cache to disk
+        dst_ds = None
+
+    #function to get Authority (e.g. EPSG) code from well known text
+    def wkt_to_epsg(self, wkt):
+        """Accepts well known text of Projection/Coordinate Reference System and
+        generates EPSG code."""
+        if wkt is not None:
+            if wkt == '':
+                return 0
+            else:
+                srs = osr.SpatialReference(wkt)
+                if (srs.IsProjected()):
+                    return int(srs.GetAuthorityCode("PROJCS"))
+                elif (srs.IsLocal()):
+                    return 0
+                else:
+                    return int(srs.GetAuthorityCode("GEOGCS"))
+        else:
+            raise ValueError('WKT value must not be None')
+
+    def band_to_txt(self, band, outfile):
+        """Accepts numpy array writes to specified text file on disk."""
+        if ma.isMaskedArray(band) is True:
+            outraster = ma.compressed(band)
+        else:
+            outraster = band
+        np.savetxt(outfile, outraster, fmt='%f')
 </code></pre>
   </div>
 
@@ -1228,18 +1325,18 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO', this);">Show source &equiv;</a></p>
   <div id="source-pyraster.RasterIO" class="source">
     <pre><code>class RasterIO:
-    '''A high-level API for Python software to process large suites of
+    """A high-level API for Python software to process large suites of
     geospatial rasters, with a particular focus on satellite imagery.
 
       The RasterIO class uses the Geospatial Data Abstraction Library
       ([GDAL](http://gdal.org)) to read and write images and their geospatial
-      metadata to and from NumPy arrays.'''
+      metadata to and from NumPy arrays."""
 
     def __init__(self):
-        '''Create an instance of a RasterIO interface'''
+        """Create an instance of a RasterIO interface"""
         #Data type dictionaries - references from GDT's to other Python types.
         #GDT -> Numpy
-        self.gdt2npy = {
+        self.gdt_to_npy = {
             1: 'uint8',
             2: 'uint16',
             3: 'int16',
@@ -1251,7 +1348,7 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
         '''Dictionary of GDAL to NumPy data type mappings'''
 
         #Numpy -> GDT
-        self.npy2gdt = {
+        self.npy_to_gdt = {
             'uint8': 1,
             'uint16': 2,
             'int16': 3,
@@ -1264,7 +1361,7 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
 
 
         #GDT -> Struct
-        self.gdt2struct = {
+        self.gdt_to_struct = {
             1: 'B',
             2: 'H',
             3: 'h',
@@ -1276,18 +1373,17 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
         '''Dictionary of GDAL to struct module data type mappings'''
 
     def open(self, file_name):
-        '''
-        Accepts a GDAL compatible file on disk and returns GDAL dataset
-        '''
+        """Accepts a GDAL compatible file on disk and returns GDAL dataset"""
+
         dataset = gdal.Open(file_name, GA_ReadOnly)
         #check if something returned
         if dataset is not None:
             return dataset
         else:
-            raise IOError
+            raise IOError('Could not open file')
 
     def read_metadata(self, dataset):
-        '''Accepts GDAL dataset, returns metadata dict
+        """Accepts GDAL dataset, returns metadata dict
         {gdal_driver,
         xsize,
         ysize,
@@ -1303,7 +1399,7 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
         - geotransform[3] = top left y
         - geotransform[4] = rotation, 0 if image is "north up"
         - geotransform[5] = north to south pixel resolution
-        '''
+        """
         #get GDAL driver
         driver_short = dataset.GetDriver().ShortName
         driver_long = dataset.GetDriver().LongName
@@ -1325,20 +1421,20 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
                 'geotranslation': geotransform
                 }
 
-    def mask_band(dataarray, NoDataVal):
-        '''Accepts NumPy array, mask value and returns masked array'''
+    def mask_band(self, array, NoDataVal):
+        """Accepts NumPy array, mask value and returns masked array"""
 
         #check if data type int or float using dictionary for numeric test
-        if npy2gdt[datarray.dtype.name] <= 5:
+        if self.npy_to_gdt[array.dtype.name] <= 5:
             #data is integer use masked_equal
             #apply NoDataValue masking.
-            dataraster = ma.masked_equal(datarray, NoDataVal, copy=False)
+            dataraster = ma.masked_equal(array, NoDataVal, copy=False)
             #apply invalid data masking
             dataraster = ma.masked_invalid(dataraster, copy=False)
             return dataraster
         else:
             #data is float use masked_values
-            dataraster = ma.masked_values(datarray, NoDataVal, copy=False)
+            dataraster = ma.masked_values(array, NoDataVal, copy=False)
             #finaly apply mask for NaN values
             dataraster = ma.masked_invalid(dataraster, copy=False)
             #return array (raster)
@@ -1346,8 +1442,8 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
 
     #function to read a band from data and apply NoDataValue masking
     def read_band(self, dataset, band_num, NoDataVal=None, masked=True):
-        '''Accepts GDAL raster dataset and band number, returns Numpy 2D-array
-        representing pixel values'''
+        """Accepts GDAL raster dataset and band number, returns Numpy 2D-array
+        representing pixel values"""
 
         if dataset.RasterCount >= band_num:
             #Get one band
@@ -1357,7 +1453,6 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
                 #test for band specified NoDataValue
                 if band.GetNoDataValue() is not None:
                     NoDataVal = band.GetNoDataValue()
-                #	print NoData
                 else:
                     #else set NoDataValue to be 9999.
                     NoDataVal = 9999
@@ -1365,14 +1460,14 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
             band.SetNoDataValue(NoDataVal)
             #create blank array to hold data [note Y,X format]
             #get data type from dictionary
-            datarray = np.zeros((band.YSize, band.XSize), self.gdt2npy[band.DataType])
+            datarray = np.zeros((band.YSize, band.XSize), self.gdt_to_npy[band.DataType])
             #create loop based on YAxis (i.e. num rows)
             for i in range(band.YSize):
                 #read lines of band
                 scanline = band.ReadRaster(0, i, band.XSize, 1, band.XSize, 1,
                                            band.DataType)
                 #unpack from binary representation
-                tuple_of_vals = struct.unpack(self.gdt2struct[band.DataType]
+                tuple_of_vals = struct.unpack(self.gdt_to_struct[band.DataType]
                                               * band.XSize,
                                               scanline)
                 #tuple_of_floats = struct.unpack('f' * band.XSize, scanline)
@@ -1381,13 +1476,111 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
 
             #check if masked=True
             if masked is True:
-                return mask_band(datarray, NoDataVal)
+                return self.mask_band(datarray, NoDataVal)
             else:
                 #user wants numpy array, no masking.
                 return datarray
         else:
             raise ValueError("read_band: Band number exceeeds number of bands "
                             +"available in dataset")
+
+    #function to create new (empty) raster file on disk.
+    def new_raster(self, outfile, format, xsize, ysize, geotranslation, epsg,
+    num_bands, gdal_dtype):
+        """Accepts file_path, format, X, Y, geotransformation, epsg,
+        number_of_bands, gdal_datatype and returns gdal pointer to new file.
+
+        This is a lower level function that allows users to control data output
+        stream directly, use for specialist cases (e.g. varying band data types)
+        or memory limited read-write situations.
+        Note that users should not forget to close file once data output is
+        complete (dataset = None)."""
+        #get driver and driver properties
+        driver = gdal.GetDriverByName(format)
+        metadata = driver.GetMetadata()
+        #check that specified driver has gdal create method and go create
+        if gdal.DCAP_CREATE in metadata and metadata[gdal.DCAP_CREATE] == 'YES':
+            #Create file
+            dst_ds = driver.Create(outfile, xsize, ysize, num_bands, gdal_dtype)
+            #define "srs" as a home for coordinate system parameters
+            srs = osr.SpatialReference()
+            #import the standard EPSG ProjCRS
+            srs.ImportFromEPSG(epsg)
+            #apply the geotransformation parameters
+            dst_ds.SetGeoTransform(geotranslation)
+            #export these features to embedded well Known Text in the GeoTiff
+            dst_ds.SetProjection(srs.ExportToWkt())
+            return dst_ds
+        #catch error if no write method for format specified
+        else:
+            raise IOError('Specified format not writeable by GDAL')
+
+    def new_band(self, dataset, array, band_num, NoDataVal=None):
+        """Accepts a GDAL dataset, rasterarray, band number, [NoDataValue],
+        and creates new band in file."""
+        #first check whether array is masked
+        if ma.isMaskedArray(array) is True:
+            if NoDataVal is None:
+                if npy_to_gdt[array[0].dtype.name] == 1:
+                    NoDataVal = 0
+                else:
+                    NoDataVal = 9999
+            dst_ds.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
+            #create a numpy view on the masked array
+            output = np.array(array, copy=False)
+            #check if maskedarray has valid mask and apply to numpy array using
+            # binary indexing.
+            if array.mask is not ma.nomask:
+                output[array.mask] = NoDataVal
+            #write out numpy array with masking
+            dst_ds.GetRasterBand(band_num).WriteArray(output)
+        else:
+            #input array is numpy already, write array to band in file
+            dst_ds.GetRasterBand(band_num).WriteArray(array)
+
+    #create function to write rasters from NumPy n-dimensional array
+    def write_bands(self, outfile, format, xsize, ysize, geotranslation, epsg,
+                         NoDataVal=None, *arrays):
+        """ Accepts raster(s) in Numpy 2D-array, outputfile string, format and
+        geotranslation metadata and writes to file on disk."""
+        #get number of bands
+        num_bands = len(arrays)
+        #create new raster
+        dst_ds = new_raster(outfile, format, xsize, ysize, geotranslation,
+                            epsg, num_bands, npy_to_gdt[arrays[0].dtype.name])
+        #add raster data from raster arrays
+        band_num = 1  # band counter
+        for band in arrays:
+            new_band(dst_ds, band, band_num, NoDataVal)
+            band_num += 1
+        #close output and flush cache to disk
+        dst_ds = None
+
+    #function to get Authority (e.g. EPSG) code from well known text
+    def wkt_to_epsg(self, wkt):
+        """Accepts well known text of Projection/Coordinate Reference System and
+        generates EPSG code."""
+        if wkt is not None:
+            if wkt == '':
+                return 0
+            else:
+                srs = osr.SpatialReference(wkt)
+                if (srs.IsProjected()):
+                    return int(srs.GetAuthorityCode("PROJCS"))
+                elif (srs.IsLocal()):
+                    return 0
+                else:
+                    return int(srs.GetAuthorityCode("GEOGCS"))
+        else:
+            raise ValueError('WKT value must not be None')
+
+    def band_to_txt(self, band, outfile):
+        """Accepts numpy array writes to specified text file on disk."""
+        if ma.isMaskedArray(band) is True:
+            outraster = ma.compressed(band)
+        else:
+            outraster = band
+        np.savetxt(outfile, outraster, fmt='%f')
 </code></pre>
   </div>
 </div>
@@ -1400,7 +1593,7 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
           </ul>
           <h3>Instance variables</h3>
             <div class="item">
-            <p id="pyraster.RasterIO.gdt2npy" class="name">var <span class="ident">gdt2npy</span></p>
+            <p id="pyraster.RasterIO.gdt_to_npy" class="name">var <span class="ident">gdt_to_npy</span></p>
             
 
             
@@ -1411,7 +1604,7 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
 
             </div>
             <div class="item">
-            <p id="pyraster.RasterIO.gdt2struct" class="name">var <span class="ident">gdt2struct</span></p>
+            <p id="pyraster.RasterIO.gdt_to_struct" class="name">var <span class="ident">gdt_to_struct</span></p>
             
 
             
@@ -1422,7 +1615,7 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
 
             </div>
             <div class="item">
-            <p id="pyraster.RasterIO.npy2gdt" class="name">var <span class="ident">npy2gdt</span></p>
+            <p id="pyraster.RasterIO.npy_to_gdt" class="name">var <span class="ident">npy_to_gdt</span></p>
             
 
             
@@ -1447,10 +1640,10 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO.__init__', this);">Show source &equiv;</a></p>
   <div id="source-pyraster.RasterIO.__init__" class="source">
     <pre><code>def __init__(self):
-    '''Create an instance of a RasterIO interface'''
+    """Create an instance of a RasterIO interface"""
     #Data type dictionaries - references from GDT's to other Python types.
     #GDT -> Numpy
-    self.gdt2npy = {
+    self.gdt_to_npy = {
         1: 'uint8',
         2: 'uint16',
         3: 'int16',
@@ -1461,7 +1654,7 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
     }
     '''Dictionary of GDAL to NumPy data type mappings'''
     #Numpy -> GDT
-    self.npy2gdt = {
+    self.npy_to_gdt = {
         'uint8': 1,
         'uint16': 2,
         'int16': 3,
@@ -1472,7 +1665,7 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
     }
     '''Dictionary of NumPy to GDAL data type mappings'''
     #GDT -> Struct
-    self.gdt2struct = {
+    self.gdt_to_struct = {
         1: 'B',
         2: 'H',
         3: 'h',
@@ -1490,8 +1683,34 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
   
             
   <div class="item">
+    <div class="name def" id="pyraster.RasterIO.band_to_txt">
+    <p>def <span class="ident">band_to_txt</span>(</p><p>self, band, outfile)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Accepts numpy array writes to specified text file on disk.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO.band_to_txt', this);">Show source &equiv;</a></p>
+  <div id="source-pyraster.RasterIO.band_to_txt" class="source">
+    <pre><code>def band_to_txt(self, band, outfile):
+    """Accepts numpy array writes to specified text file on disk."""
+    if ma.isMaskedArray(band) is True:
+        outraster = ma.compressed(band)
+    else:
+        outraster = band
+    np.savetxt(outfile, outraster, fmt='%f')
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
     <div class="name def" id="pyraster.RasterIO.mask_band">
-    <p>def <span class="ident">mask_band</span>(</p><p>dataarray, NoDataVal)</p>
+    <p>def <span class="ident">mask_band</span>(</p><p>self, array, NoDataVal)</p>
     </div>
     
 
@@ -1501,23 +1720,118 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO.mask_band', this);">Show source &equiv;</a></p>
   <div id="source-pyraster.RasterIO.mask_band" class="source">
-    <pre><code>def mask_band(dataarray, NoDataVal):
-    '''Accepts NumPy array, mask value and returns masked array'''
+    <pre><code>def mask_band(self, array, NoDataVal):
+    """Accepts NumPy array, mask value and returns masked array"""
     #check if data type int or float using dictionary for numeric test
-    if npy2gdt[datarray.dtype.name] <= 5:
+    if self.npy_to_gdt[array.dtype.name] <= 5:
         #data is integer use masked_equal
         #apply NoDataValue masking.
-        dataraster = ma.masked_equal(datarray, NoDataVal, copy=False)
+        dataraster = ma.masked_equal(array, NoDataVal, copy=False)
         #apply invalid data masking
         dataraster = ma.masked_invalid(dataraster, copy=False)
         return dataraster
     else:
         #data is float use masked_values
-        dataraster = ma.masked_values(datarray, NoDataVal, copy=False)
+        dataraster = ma.masked_values(array, NoDataVal, copy=False)
         #finaly apply mask for NaN values
         dataraster = ma.masked_invalid(dataraster, copy=False)
         #return array (raster)
         return dataraster
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="pyraster.RasterIO.new_band">
+    <p>def <span class="ident">new_band</span>(</p><p>self, dataset, array, band_num, NoDataVal=None)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Accepts a GDAL dataset, rasterarray, band number, [NoDataValue],
+and creates new band in file.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO.new_band', this);">Show source &equiv;</a></p>
+  <div id="source-pyraster.RasterIO.new_band" class="source">
+    <pre><code>def new_band(self, dataset, array, band_num, NoDataVal=None):
+    """Accepts a GDAL dataset, rasterarray, band number, [NoDataValue],
+    and creates new band in file."""
+    #first check whether array is masked
+    if ma.isMaskedArray(array) is True:
+        if NoDataVal is None:
+            if npy_to_gdt[array[0].dtype.name] == 1:
+                NoDataVal = 0
+            else:
+                NoDataVal = 9999
+        dst_ds.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
+        #create a numpy view on the masked array
+        output = np.array(array, copy=False)
+        #check if maskedarray has valid mask and apply to numpy array using
+        # binary indexing.
+        if array.mask is not ma.nomask:
+            output[array.mask] = NoDataVal
+        #write out numpy array with masking
+        dst_ds.GetRasterBand(band_num).WriteArray(output)
+    else:
+        #input array is numpy already, write array to band in file
+        dst_ds.GetRasterBand(band_num).WriteArray(array)
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="pyraster.RasterIO.new_raster">
+    <p>def <span class="ident">new_raster</span>(</p><p>self, outfile, format, xsize, ysize, geotranslation, epsg, num_bands, gdal_dtype)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Accepts file_path, format, X, Y, geotransformation, epsg,
+number_of_bands, gdal_datatype and returns gdal pointer to new file.</p>
+<p>This is a lower level function that allows users to control data output
+stream directly, use for specialist cases (e.g. varying band data types)
+or memory limited read-write situations.
+Note that users should not forget to close file once data output is
+complete (dataset = None).</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO.new_raster', this);">Show source &equiv;</a></p>
+  <div id="source-pyraster.RasterIO.new_raster" class="source">
+    <pre><code>def new_raster(self, outfile, format, xsize, ysize, geotranslation, epsg,
+num_bands, gdal_dtype):
+    """Accepts file_path, format, X, Y, geotransformation, epsg,
+    number_of_bands, gdal_datatype and returns gdal pointer to new file.
+    This is a lower level function that allows users to control data output
+    stream directly, use for specialist cases (e.g. varying band data types)
+    or memory limited read-write situations.
+    Note that users should not forget to close file once data output is
+    complete (dataset = None)."""
+    #get driver and driver properties
+    driver = gdal.GetDriverByName(format)
+    metadata = driver.GetMetadata()
+    #check that specified driver has gdal create method and go create
+    if gdal.DCAP_CREATE in metadata and metadata[gdal.DCAP_CREATE] == 'YES':
+        #Create file
+        dst_ds = driver.Create(outfile, xsize, ysize, num_bands, gdal_dtype)
+        #define "srs" as a home for coordinate system parameters
+        srs = osr.SpatialReference()
+        #import the standard EPSG ProjCRS
+        srs.ImportFromEPSG(epsg)
+        #apply the geotransformation parameters
+        dst_ds.SetGeoTransform(geotranslation)
+        #export these features to embedded well Known Text in the GeoTiff
+        dst_ds.SetProjection(srs.ExportToWkt())
+        return dst_ds
+    #catch error if no write method for format specified
+    else:
+        raise IOError('Specified format not writeable by GDAL')
 </code></pre>
   </div>
 </div>
@@ -1538,15 +1852,13 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO.open', this);">Show source &equiv;</a></p>
   <div id="source-pyraster.RasterIO.open" class="source">
     <pre><code>def open(self, file_name):
-    '''
-    Accepts a GDAL compatible file on disk and returns GDAL dataset
-    '''
+    """Accepts a GDAL compatible file on disk and returns GDAL dataset"""
     dataset = gdal.Open(file_name, GA_ReadOnly)
     #check if something returned
     if dataset is not None:
         return dataset
     else:
-        raise IOError
+        raise IOError('Could not open file')
 </code></pre>
   </div>
 </div>
@@ -1568,8 +1880,8 @@ representing pixel values</p></div>
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO.read_band', this);">Show source &equiv;</a></p>
   <div id="source-pyraster.RasterIO.read_band" class="source">
     <pre><code>def read_band(self, dataset, band_num, NoDataVal=None, masked=True):
-    '''Accepts GDAL raster dataset and band number, returns Numpy 2D-array
-    representing pixel values'''
+    """Accepts GDAL raster dataset and band number, returns Numpy 2D-array
+    representing pixel values"""
     if dataset.RasterCount >= band_num:
         #Get one band
         band = dataset.GetRasterBand(band_num)
@@ -1578,7 +1890,6 @@ representing pixel values</p></div>
             #test for band specified NoDataValue
             if band.GetNoDataValue() is not None:
                 NoDataVal = band.GetNoDataValue()
-            #	print NoData
             else:
                 #else set NoDataValue to be 9999.
                 NoDataVal = 9999
@@ -1586,14 +1897,14 @@ representing pixel values</p></div>
         band.SetNoDataValue(NoDataVal)
         #create blank array to hold data [note Y,X format]
         #get data type from dictionary
-        datarray = np.zeros((band.YSize, band.XSize), self.gdt2npy[band.DataType])
+        datarray = np.zeros((band.YSize, band.XSize), self.gdt_to_npy[band.DataType])
         #create loop based on YAxis (i.e. num rows)
         for i in range(band.YSize):
             #read lines of band
             scanline = band.ReadRaster(0, i, band.XSize, 1, band.XSize, 1,
                                        band.DataType)
             #unpack from binary representation
-            tuple_of_vals = struct.unpack(self.gdt2struct[band.DataType]
+            tuple_of_vals = struct.unpack(self.gdt_to_struct[band.DataType]
                                           * band.XSize,
                                           scanline)
             #tuple_of_floats = struct.unpack('f' * band.XSize, scanline)
@@ -1601,7 +1912,7 @@ representing pixel values</p></div>
             datarray[i, :] = tuple_of_vals
         #check if masked=True
         if masked is True:
-            return mask_band(datarray, NoDataVal)
+            return self.mask_band(datarray, NoDataVal)
         else:
             #user wants numpy array, no masking.
             return datarray
@@ -1643,7 +1954,7 @@ geotranslation}</p>
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO.read_metadata', this);">Show source &equiv;</a></p>
   <div id="source-pyraster.RasterIO.read_metadata" class="source">
     <pre><code>def read_metadata(self, dataset):
-    '''Accepts GDAL dataset, returns metadata dict
+    """Accepts GDAL dataset, returns metadata dict
     {gdal_driver,
     xsize,
     ysize,
@@ -1657,7 +1968,7 @@ geotranslation}</p>
     - geotransform[3] = top left y
     - geotransform[4] = rotation, 0 if image is "north up"
     - geotransform[5] = north to south pixel resolution
-    '''
+    """
     #get GDAL driver
     driver_short = dataset.GetDriver().ShortName
     driver_long = dataset.GetDriver().LongName
@@ -1678,6 +1989,78 @@ geotranslation}</p>
             'projection': proj_wkt,
             'geotranslation': geotransform
             }
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="pyraster.RasterIO.wkt_to_epsg">
+    <p>def <span class="ident">wkt_to_epsg</span>(</p><p>self, wkt)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Accepts well known text of Projection/Coordinate Reference System and
+generates EPSG code.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO.wkt_to_epsg', this);">Show source &equiv;</a></p>
+  <div id="source-pyraster.RasterIO.wkt_to_epsg" class="source">
+    <pre><code>def wkt_to_epsg(self, wkt):
+    """Accepts well known text of Projection/Coordinate Reference System and
+    generates EPSG code."""
+    if wkt is not None:
+        if wkt == '':
+            return 0
+        else:
+            srs = osr.SpatialReference(wkt)
+            if (srs.IsProjected()):
+                return int(srs.GetAuthorityCode("PROJCS"))
+            elif (srs.IsLocal()):
+                return 0
+            else:
+                return int(srs.GetAuthorityCode("GEOGCS"))
+    else:
+        raise ValueError('WKT value must not be None')
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="pyraster.RasterIO.write_bands">
+    <p>def <span class="ident">write_bands</span>(</p><p>self, outfile, format, xsize, ysize, geotranslation, epsg, NoDataVal=None, *arrays)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Accepts raster(s) in Numpy 2D-array, outputfile string, format and
+geotranslation metadata and writes to file on disk.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO.write_bands', this);">Show source &equiv;</a></p>
+  <div id="source-pyraster.RasterIO.write_bands" class="source">
+    <pre><code>def write_bands(self, outfile, format, xsize, ysize, geotranslation, epsg,
+                     NoDataVal=None, *arrays):
+    """ Accepts raster(s) in Numpy 2D-array, outputfile string, format and
+    geotranslation metadata and writes to file on disk."""
+    #get number of bands
+    num_bands = len(arrays)
+    #create new raster
+    dst_ds = new_raster(outfile, format, xsize, ysize, geotranslation,
+                        epsg, num_bands, npy_to_gdt[arrays[0].dtype.name])
+    #add raster data from raster arrays
+    band_num = 1  # band counter
+    for band in arrays:
+        new_band(dst_ds, band, band_num, NoDataVal)
+        band_num += 1
+    #close output and flush cache to disk
+    dst_ds = None
 </code></pre>
   </div>
 </div>

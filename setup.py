@@ -1,8 +1,7 @@
-
 from distutils.core import setup
 
 setup(name='pyraster',
-      version='1.1.2',
+      version='2.0.0',
       description='Python Geospatial Image Processing',
       author='Tomas Holderness',
       author_email='tomasholderness@gmail.com',
