@@ -3,6 +3,7 @@ PyRaster
 ###Python Geospatial Image Processing
 
 [![Build Status](https://travis-ci.org/talltom/PyRaster.svg?branch=dev)](https://travis-ci.org/talltom/PyRaster)
+[![Coverage Status](https://coveralls.io/repos/talltom/PyRaster/badge.svg?branch=dev)](https://coveralls.io/r/talltom/PyRaster?branch=dev)
 
 ##About
 PyRaster provides two elements:
