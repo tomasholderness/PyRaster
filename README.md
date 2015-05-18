@@ -254,31 +254,18 @@ API documentation for pyraster is created using pdoc, generate HTML files in the
 [pyraster]$ pdoc --html --html-dir=doc/ --overwrite pyraster.py
 ```
 ##Notes
-<a name="1"></a>[1] Geospatial Data Abstraction Library http://gdal.org
-
-<a name="2"></a>[2] Holderness, T. 2013 PhD Thesis http://hdl.handle.net/10443/1856
-
-<a name="3"></a>[3] Holderness, T. 2010 PyRaster Presentation https://tomholderness.files.wordpress.com/2012/12/holderness_asu_pyraster_pres_handout.pdf
-
-<a name="4"></a>[4] Raster Processing Suite QGIS Plugin http://talltom.github.io/Raster-Processing-Suite/
-
-<a name="5"></a>[5] GDAL Format List http://www.gdal.org/formats_list.html
-
+<a name="1"></a>[1] Geospatial Data Abstraction Library http://gdal.org  
+<a name="2"></a>[2] Holderness, T. 2013 PhD Thesis http://hdl.handle.net/10443/1856  
+<a name="3"></a>[3] Holderness, T. 2010 PyRaster Presentation https://tomholderness.files.wordpress.com/2012/12/holderness_asu_pyraster_pres_handout.pdf  
+<a name="4"></a>[4] Raster Processing Suite QGIS Plugin http://talltom.github.io/Raster-Processing-Suite/  
+<a name="5"></a>[5] GDAL Format List http://www.gdal.org/formats_list.html  
 <a name="6"></a>[6] NumPy Arrays
-http://docs.scipy.org/doc/numpy/reference/maskedarray.html
-
-<a name="7"></a>[7] GDAL No Data Values (http://www.gdal.org/classGDALRasterBand.html#adcca51d230b5ac848c43f1896293fb50)
-
-<a name="8"></a>[8] NumPy Elementwise Array Operations http://wiki.scipy.org/Tentative_NumPy_Tutorial#head-4c1d53fe504adc97baf27b65513b4b97586a4fc5
-
-<a name="9"></a>[9] NumPy Universal Functions http://wiki.scipy.org/Tentative_NumPy_Tutorial#head-053463ac1c1df8d47f8723f470b62c4bd0d11f07
-
-<a name="10"></a>[10] Normalised Difference Vegetation Index https://en.wikipedia.org/wiki/Normalized_Difference_Vegetation_Index
-
-<a name="11"></a>[11] NumPy vectorize  http://docs.scipy.org/doc/numpy/reference/generated/numpy.vectorize.html
-
-<a name="12"></a>[12] Python Multiprocessing module https://docs.python.org/2/library/multiprocessing.html
-
-<a name="13"></a>[13] Plotting an image histogram with Matplotlib http://matplotlib.org/users/image_tutorial.html#examining-a-specific-data-range
-
+http://docs.scipy.org/doc/numpy/reference/maskedarray.html  
+<a name="7"></a>[7] GDAL No Data Values (http://www.gdal.org/classGDALRasterBand.html#adcca51d230b5ac848c43f1896293fb50)  
+<a name="8"></a>[8] NumPy Elementwise Array Operations http://wiki.scipy.org/Tentative_NumPy_Tutorial#head-4c1d53fe504adc97baf27b65513b4b97586a4fc5  
+<a name="9"></a>[9] NumPy Universal Functions http://wiki.scipy.org/Tentative_NumPy_Tutorial#head-053463ac1c1df8d47f8723f470b62c4bd0d11f07  
+<a name="10"></a>[10] Normalised Difference Vegetation Index https://en.wikipedia.org/wiki/Normalized_Difference_Vegetation_Index  
+<a name="11"></a>[11] NumPy vectorize  http://docs.scipy.org/doc/numpy/reference/generated/numpy.vectorize.html  
+<a name="12"></a>[12] Python Multiprocessing module https://docs.python.org/2/library/multiprocessing.html  
+<a name="13"></a>[13] Plotting an image histogram with Matplotlib http://matplotlib.org/users/image_tutorial.html#examining-a-specific-data-range  
 <a name="14"></a>[14] Plotting an image with Matploblib http://matplotlib.org/users/image_tutorial.html#image-tutorial
