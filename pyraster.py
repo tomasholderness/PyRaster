@@ -69,7 +69,7 @@ class RasterIO:
         if dataset is not None:
             return dataset
         else:
-            raise IOError
+            raise IOError('Could not open file')
 
     def read_metadata(self, dataset):
         """Accepts GDAL dataset, returns metadata dict
@@ -261,7 +261,7 @@ class RasterIO:
                 else:
                     return int(srs.GetAuthorityCode("GEOGCS"))
         else:
-            raise TypeError
+            raise ValueError('WKT value must not be None')
 
     def band_to_txt(self, band, outfile):
         """Accepts numpy array writes to specified text file on disk."""
