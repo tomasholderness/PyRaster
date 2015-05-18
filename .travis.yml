@@ -9,9 +9,17 @@ before_install:
   - sudo apt-get install -y python-gdal
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
 # command to install remaining dependencies via pip install -r requirements.txt
-install: pip install -r requirements.txt
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
 # command to run tests, e.g. python setup.py test
-script:  python test/rasterio_test.py
+script:
+  coverage run --pylib --source=pyraster test/rasterio_test.py
+
+# after success
+after_success:
+  coveralls
+
 # blacklist
 branches:
   except:

@@ -7,13 +7,13 @@ PyRaster
 ##About
 PyRaster provides two elements:
 
-1. PyRaster module (RasterIO Class)
+####1. PyRaster module (RasterIO Class)
 
   The aim of the module is to provide a high-level API for Python software to process large suites of geospatial rasters, with a particular focus on satellite imagery.
 
   The RasterIO class uses the Geospatial Data Abstraction Library (GDAL)<sup>[1](#1)</sup> to read and write images and their geospatial metadata to and from NumPy arrays.
 
-2. Templates
+####2. Templates
 
   The template scripts use RasterIO to demonstrate a series of functions for efficient batch processing of remote sensing imagery, including vectorizing array operations and using the multiprocessing module to parallelize computation.
 
@@ -37,8 +37,7 @@ This software was developed as part of my PhD thesis to batch process large time
 * Python 2.7
 * Numpy 1.9
 * OSgeo (GDAL) 1.11
-####Optional
-* Matplotlib
+* Matplotlib (optional)
 
 ###Installation
 To install the RasterIO module do:
@@ -75,7 +74,7 @@ To read a raster file from disk and covert it to a NumPy array three RasterIO fu
 
 2. read_band(dataset, band_number, NoDataVal=None, masked=True)
 
-  Accepts a GDAL raster dataset and band number, returns Numpy 2D-array.'''
+  Accepts a GDAL raster dataset and band number, returns Numpy 2D-array.
 
 Figure 1 shows the process of loading a raster file into a NumPy array using the RasterIO open and read functions. For example:
 
@@ -111,7 +110,7 @@ GTIFF
 PyRaster uses NumPy masked arrays <sup>[6](#6)</sup> to handle no data values in raster images. When masking is in place, masked values are not included in array calculations.
 
 No Data Values (`NoDataValue`) are derived from individual band metadata using the `band.GetNoDataValue()` GDAL function <sup>[7](#7)</sup>.
-If the input raster has no recognisable `NoDataValue` readable by GDAL then the input `NoDataValue` is assumed to be 9999. This can be changed by manually specifying an input NoDataVal when calling read - rasterbands()
+If the input raster has no recognisable `NoDataValue` readable by GDAL then the input `NoDataValue` is assumed to be 9999. This can be changed by manually specifying an input NoDataVal when calling `read_band()`.
 
 In accordance with GDAL the output data NoDataValue is 9999 or 9999.0 or can be manually set by when write_bands(). Note that when using unsigned integer data types the default output NoDataValue will be 0.
 
@@ -186,7 +185,7 @@ value_test_vect = numpy.vectorize(value_test)
 new_array = value_test_vect(band1, some_value)
 ```
 
-###3.3 multiprocess.py
+####3.3 multiprocess.py
 The Python Multiprocessing module can be used to parallelize processing of multiple scenes. <sup>[12](#12)</sup> The multiprocess script demonstrates using two threads to simultaneously calculate NDVI for a list of raster images. The list of images to process is split into two, and each assigned to a separate processing thread.
 
 ```python
@@ -195,7 +194,7 @@ p1 = Process(target=processRun, args=(q, flist[:half_length]))
 p2 = Process(target=processRun, args=(q, flist[half_length:]))
 ```
 
-###3.4 historgram.py
+####3.4 historgram.py
 This script demonstrates creation of a band histogram plotted using the Matplotlib library. <sup>[13](#13)</sup>
 The array is first flattened, and then passed to the Matploblib `hist` method.
 
@@ -207,7 +206,7 @@ ax.hist(flat_raster, 10, normed=0, histtype='bar',
         align=mid)
 ```
 
-###3.5 plot.py
+####3.5 plot.py
 The Matplotlib library can also be used to plot arrays as images using the `imshow` method. <sup>[14](#14)</sup>
 
 ```python
