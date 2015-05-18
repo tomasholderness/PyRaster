@@ -37,13 +37,15 @@ This software was developed as part of my PhD thesis to batch process large time
 * Python 2.7
 * Numpy 1.9
 * OSgeo (GDAL) 1.11
+####Optional
+* Matplotlib
 
 ###Installation
 To install the RasterIO module do:
 ```bash
 [pyraster]$ python install setup.py
 ```
-The scripts should now be able to find and load the module.
+Python, and the PyRaster scripts should now be able to find and load the module.
 
 ##Using the Software
 ###1 Getting Started with the RasterIO API

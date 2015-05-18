@@ -1,6 +1,8 @@
 """
 vectorize.py - create an optimised matrix function for pixel-wise raster
-computation. Part of the PyRaster suite.
+computation.
+
+Part of the PyRaster suite https://github.com/talltom/PyRaster
 
 Using the numpy.vectorize() function it is possible to create an
 #optimised matrix function from a standard function.
