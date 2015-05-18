@@ -1,9 +1,9 @@
 """
 ###Python Geospatial Image Processing
 
-http://github.com/talltom/pyraster](http://github.com/talltom/pyraster
+[http://github.com/talltom/pyraster](http://github.com/talltom/pyraster)
 
-version 2.0"""
+version 2.0.0"""
 __version__ = "2.0.0"  # module version
 
 import struct

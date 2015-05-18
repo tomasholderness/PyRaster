@@ -6,7 +6,7 @@
     <title>pyraster API documentation</title>
     <meta name="description" content="###Python Geospatial Image Processing
 
-http://github.com/talltom/pyraster](http://github.com/talltom..." />
+[http://github.com/talltom/pyraster](http://github.com/tallto..." />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   
@@ -1016,17 +1016,17 @@ table {
   <header id="section-intro">
   <h1 class="title"><span class="name">pyraster</span> module</h1>
   <h3>Python Geospatial Image Processing</h3>
-<p>http://github.com/talltom/pyraster](http://github.com/talltom/pyraster</p>
-<p>version 2.0</p>
+<p><a href="http://github.com/talltom/pyraster">http://github.com/talltom/pyraster</a></p>
+<p>version 2.0.0</p>
   
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster', this);">Show source &equiv;</a></p>
   <div id="source-pyraster" class="source">
     <pre><code>"""
 ###Python Geospatial Image Processing
 
-http://github.com/talltom/pyraster](http://github.com/talltom/pyraster
+[http://github.com/talltom/pyraster](http://github.com/talltom/pyraster)
 
-version 2.0"""
+version 2.0.0"""
 __version__ = "2.0.0"  # module version
 
 import struct
@@ -1233,11 +1233,11 @@ class RasterIO:
         #first check whether array is masked
         if ma.isMaskedArray(array) is True:
             if NoDataVal is None:
-                if npy_to_gdt[array[0].dtype.name] == 1:
+                if self.npy_to_gdt[array[0].dtype.name] == 1:
                     NoDataVal = 0
                 else:
                     NoDataVal = 9999
-            dst_ds.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
+            dataset.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
             #create a numpy view on the masked array
             output = np.array(array, copy=False)
             #check if maskedarray has valid mask and apply to numpy array using
@@ -1245,25 +1245,25 @@ class RasterIO:
             if array.mask is not ma.nomask:
                 output[array.mask] = NoDataVal
             #write out numpy array with masking
-            dst_ds.GetRasterBand(band_num).WriteArray(output)
+            dataset.GetRasterBand(band_num).WriteArray(output)
         else:
             #input array is numpy already, write array to band in file
-            dst_ds.GetRasterBand(band_num).WriteArray(array)
+            dataset.GetRasterBand(band_num).WriteArray(array)
 
     #create function to write rasters from NumPy n-dimensional array
     def write_bands(self, outfile, format, xsize, ysize, geotranslation, epsg,
-                         NoDataVal=None, *arrays):
+                         NoDataVal, *arrays):
         """ Accepts raster(s) in Numpy 2D-array, outputfile string, format and
         geotranslation metadata and writes to file on disk."""
         #get number of bands
         num_bands = len(arrays)
         #create new raster
-        dst_ds = new_raster(outfile, format, xsize, ysize, geotranslation,
-                            epsg, num_bands, npy_to_gdt[arrays[0].dtype.name])
+        dst_ds = self.new_raster(outfile, format, xsize, ysize, geotranslation,
+                            epsg, num_bands, self.npy_to_gdt[arrays[0].dtype.name])
         #add raster data from raster arrays
         band_num = 1  # band counter
         for band in arrays:
-            new_band(dst_ds, band, band_num, NoDataVal)
+            self.new_band(dst_ds, band, band_num, NoDataVal)
             band_num += 1
         #close output and flush cache to disk
         dst_ds = None
@@ -1521,11 +1521,11 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
         #first check whether array is masked
         if ma.isMaskedArray(array) is True:
             if NoDataVal is None:
-                if npy_to_gdt[array[0].dtype.name] == 1:
+                if self.npy_to_gdt[array[0].dtype.name] == 1:
                     NoDataVal = 0
                 else:
                     NoDataVal = 9999
-            dst_ds.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
+            dataset.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
             #create a numpy view on the masked array
             output = np.array(array, copy=False)
             #check if maskedarray has valid mask and apply to numpy array using
@@ -1533,25 +1533,25 @@ geospatial rasters, with a particular focus on satellite imagery.</p>
             if array.mask is not ma.nomask:
                 output[array.mask] = NoDataVal
             #write out numpy array with masking
-            dst_ds.GetRasterBand(band_num).WriteArray(output)
+            dataset.GetRasterBand(band_num).WriteArray(output)
         else:
             #input array is numpy already, write array to band in file
-            dst_ds.GetRasterBand(band_num).WriteArray(array)
+            dataset.GetRasterBand(band_num).WriteArray(array)
 
     #create function to write rasters from NumPy n-dimensional array
     def write_bands(self, outfile, format, xsize, ysize, geotranslation, epsg,
-                         NoDataVal=None, *arrays):
+                         NoDataVal, *arrays):
         """ Accepts raster(s) in Numpy 2D-array, outputfile string, format and
         geotranslation metadata and writes to file on disk."""
         #get number of bands
         num_bands = len(arrays)
         #create new raster
-        dst_ds = new_raster(outfile, format, xsize, ysize, geotranslation,
-                            epsg, num_bands, npy_to_gdt[arrays[0].dtype.name])
+        dst_ds = self.new_raster(outfile, format, xsize, ysize, geotranslation,
+                            epsg, num_bands, self.npy_to_gdt[arrays[0].dtype.name])
         #add raster data from raster arrays
         band_num = 1  # band counter
         for band in arrays:
-            new_band(dst_ds, band, band_num, NoDataVal)
+            self.new_band(dst_ds, band, band_num, NoDataVal)
             band_num += 1
         #close output and flush cache to disk
         dst_ds = None
@@ -1763,11 +1763,11 @@ and creates new band in file.</p></div>
     #first check whether array is masked
     if ma.isMaskedArray(array) is True:
         if NoDataVal is None:
-            if npy_to_gdt[array[0].dtype.name] == 1:
+            if self.npy_to_gdt[array[0].dtype.name] == 1:
                 NoDataVal = 0
             else:
                 NoDataVal = 9999
-        dst_ds.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
+        dataset.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
         #create a numpy view on the masked array
         output = np.array(array, copy=False)
         #check if maskedarray has valid mask and apply to numpy array using
@@ -1775,10 +1775,10 @@ and creates new band in file.</p></div>
         if array.mask is not ma.nomask:
             output[array.mask] = NoDataVal
         #write out numpy array with masking
-        dst_ds.GetRasterBand(band_num).WriteArray(output)
+        dataset.GetRasterBand(band_num).WriteArray(output)
     else:
         #input array is numpy already, write array to band in file
-        dst_ds.GetRasterBand(band_num).WriteArray(array)
+        dataset.GetRasterBand(band_num).WriteArray(array)
 </code></pre>
   </div>
 </div>
@@ -2034,7 +2034,7 @@ generates EPSG code.</p></div>
             
   <div class="item">
     <div class="name def" id="pyraster.RasterIO.write_bands">
-    <p>def <span class="ident">write_bands</span>(</p><p>self, outfile, format, xsize, ysize, geotranslation, epsg, NoDataVal=None, *arrays)</p>
+    <p>def <span class="ident">write_bands</span>(</p><p>self, outfile, format, xsize, ysize, geotranslation, epsg, NoDataVal, *arrays)</p>
     </div>
     
 
@@ -2046,18 +2046,18 @@ geotranslation metadata and writes to file on disk.</p></div>
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pyraster.RasterIO.write_bands', this);">Show source &equiv;</a></p>
   <div id="source-pyraster.RasterIO.write_bands" class="source">
     <pre><code>def write_bands(self, outfile, format, xsize, ysize, geotranslation, epsg,
-                     NoDataVal=None, *arrays):
+                     NoDataVal, *arrays):
     """ Accepts raster(s) in Numpy 2D-array, outputfile string, format and
     geotranslation metadata and writes to file on disk."""
     #get number of bands
     num_bands = len(arrays)
     #create new raster
-    dst_ds = new_raster(outfile, format, xsize, ysize, geotranslation,
-                        epsg, num_bands, npy_to_gdt[arrays[0].dtype.name])
+    dst_ds = self.new_raster(outfile, format, xsize, ysize, geotranslation,
+                        epsg, num_bands, self.npy_to_gdt[arrays[0].dtype.name])
     #add raster data from raster arrays
     band_num = 1  # band counter
     for band in arrays:
-        new_band(dst_ds, band, band_num, NoDataVal)
+        self.new_band(dst_ds, band, band_num, NoDataVal)
         band_num += 1
     #close output and flush cache to disk
     dst_ds = None
