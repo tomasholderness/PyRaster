@@ -251,7 +251,7 @@ class RasterIO:
         generates EPSG code."""
         if wkt is not None:
             if wkt == '':
-                return 0
+                raise ValueError("WKT string must not be empty")
             else:
                 srs = osr.SpatialReference(wkt)
                 if (srs.IsProjected()):
@@ -261,7 +261,7 @@ class RasterIO:
                 else:
                     return int(srs.GetAuthorityCode("GEOGCS"))
         else:
-            raise ValueError('WKT value must not be None')
+            raise ValueError('WKT string must not be None')
 
     def band_to_txt(self, band, outfile):
         """Accepts numpy array writes to specified text file on disk."""

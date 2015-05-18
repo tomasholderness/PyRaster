@@ -196,6 +196,33 @@ class test_new_raster(unittest.TestCase):
             #check that output matches expected (mocked) value
             self.assertEqual(1,output())
 
+class test_wkt_to_epsg(unittest.TestCase):
+    '''Test EPSG extraction from WKT projection string'''
+
+    def testNoneInput(self):
+        '''Test error handling of empty input'''
+
+        self.assertRaises(ValueError, pyraster.RasterIO().wkt_to_epsg, None)
+
+    def testNullInput(self):
+        '''Test error handling of null input'''
+
+        self.assertRaises(ValueError, pyraster.RasterIO().wkt_to_epsg, '')
+
+class test_band_to_text(unittest.TestCase):
+    '''Test text output function'''
+
+    def testNoMask(self):
+        ''' Test method handles arrays with no mask'''
+
+        self.val = 0
+
+        def null_save(file, raster, fmt):
+            self.val = 1
+
+        with patch('numpy.savetxt', null_save):
+            pyraster.RasterIO().band_to_txt(1, None)
+            self.assertEqual(1, self.val)
 
 if __name__ == "__main__":
     unittest.main()
