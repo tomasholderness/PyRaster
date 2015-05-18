@@ -209,6 +209,13 @@ class test_wkt_to_epsg(unittest.TestCase):
 
         self.assertRaises(ValueError, pyraster.RasterIO().wkt_to_epsg, '')
 
+    def testEPSGreturn(self):
+        '''Test expected EPSG returned'''
+
+        sample = 'PROJCS["WGS 84 / UTM zone 31N",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",3],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","32631"]]'
+
+        self.assertEquals(32631, pyraster.RasterIO().wkt_to_epsg(sample))
+
 class test_band_to_text(unittest.TestCase):
     '''Test text output function'''
 
