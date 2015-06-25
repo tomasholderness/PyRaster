@@ -251,5 +251,29 @@ class test_new_band(unittest.TestCase):
         self.dataset.GetRasterBand.assert_called_with(1)
         self.dataset.GetRasterBand().SetNoDataValue.assert_called_with(9999)
 
+class test_write_bands(unittest.TestCase):
+    '''Testing write bands method'''
+
+    def setUp(self):
+        pyraster.RasterIO.new_raster= MagicMock()
+        self.outfile = MagicMock(return_value='foo')
+        self.format = MagicMock(return_value='a')
+        self.xsize = MagicMock(return_value=100)
+        self.ysize = MagicMock(return_value=100)
+        self.geotranslation = MagicMock(return_value=1)
+        self.epsg = MagicMock(return_value=2)
+        self.nodata = MagicMock(return_value=678)
+        #self.array = ma.array([1, 2, 3], mask = [0, 9999, 0], dtype='int32')
+        #print self.array.mask
+        self.array = MagicMock()
+        self.array.dtype.name = 'int32'
+        self.array.mask = [1]
+
+    def testWriteBands(self):
+        '''Test correct values are passed to new_raster method'''
+        pyraster.RasterIO().write_bands(self.outfile, self.format, self.xsize, self.ysize, self.geotranslation, self.epsg, self.nodata, self.array)
+        pyraster.RasterIO.new_raster.assert_called_with(self.outfile, self.format, self.xsize, self.ysize, self.geotranslation, self.epsg, 1, pyraster.RasterIO().npy_to_gdt['int32'])
+
+
 if __name__ == "__main__":
     unittest.main()
