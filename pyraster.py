@@ -214,7 +214,8 @@ class RasterIO:
                     NoDataVal = 0
                 else:
                     NoDataVal = 9999
-            dataset.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
+                dataset.GetRasterBand(band_num).SetNoDataValue(NoDataVal)
+
             #create a numpy view on the masked array
             output = np.array(array, copy=False)
             #check if maskedarray has valid mask and apply to numpy array using

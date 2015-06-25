@@ -231,5 +231,25 @@ class test_band_to_text(unittest.TestCase):
             pyraster.RasterIO().band_to_txt(1, None)
             self.assertEqual(1, self.val)
 
+class test_new_band(unittest.TestCase):
+    '''Test creation of new band'''
+
+    def setUp(self):
+        '''Setup mock dataset'''
+        self.dataset = MagicMock()
+        self.array = ma.array([1, 2, 3], mask = [0, 1, 0], dtype='int32')
+        self.band_num = 1
+        self.object = MagicMock()
+
+        ma.isMaskedArray = MagicMock(return_value=True)
+        osgeo.gdal.Band.SetNoDataValue = MagicMock()
+
+    def testMaskValue(self):
+        '''Test correct mask value is applied if none supplied'''
+        pyraster.RasterIO().new_band(self.dataset, self.array, self.band_num, NoDataVal=None)
+
+        self.dataset.GetRasterBand.assert_called_with(1)
+        self.dataset.GetRasterBand().SetNoDataValue.assert_called_with(9999)
+
 if __name__ == "__main__":
     unittest.main()
