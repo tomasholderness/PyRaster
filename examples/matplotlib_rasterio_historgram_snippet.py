@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Script to plot raster image histogram
-import sys, os, string, rasterIO
+import sys, os, string, rasterio
 import numpy.ma as ma
 import matplotlib.pyplot as plt
  
@@ -18,7 +18,7 @@ def rasterHistogram(raster_matrix):
      
     # Plot histogram
     ax.hist(flat_raster, 10, normed=0, histtype='bar',
-            align=mid)
+            align='mid')
     # Show the plot on screen
     plt.show()
      
